@@ -1,4 +1,4 @@
-name: gcn-small
+name: gcn-gpu
 channels:
   - defaults
   - pytorch
