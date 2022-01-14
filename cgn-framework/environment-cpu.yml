@@ -13,6 +13,7 @@ dependencies:
   - matplotlib==3.5.1
   - scipy==1.7.3
   - pandas==1.3.5
+  - ipython=8.0.0
   - pip:
     - tqdm==4.62.3
     - repackage==0.7.3
