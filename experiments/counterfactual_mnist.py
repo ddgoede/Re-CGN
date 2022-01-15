@@ -14,18 +14,20 @@ from torchvision.utils import make_grid
 from matplotlib import pyplot as plt
 import os
 
-from set_env import set_env
+from experiment_utils import set_env
 set_env()
 
 from cgn_framework.mnists.generate_data import generate_cf_dataset, generate_dataset, get_dataloaders
 from cgn_framework.mnists.train_cgn import CGN
+
 
 DATASETS = {"colored_MNIST": "cgn_colored_MNIST",
             "double_colored_MNIST": "cgn_double_colored_MNIST",
             "wildlife_MNIST": "cgn_wildlife_MNIST"
             }
 
-def generate_counterfactual_images(dataset_size=100000, no_cfs=10):
+
+def generate_counterfactual(dataset_size=100000, no_cfs=10):
     """Generate the counterfactual images for the 3 datasets."""
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -59,12 +61,13 @@ def generate_counterfactual_images(dataset_size=100000, no_cfs=10):
 
 
 def main():
-    generate_counterfactual_images()
+    generate_counterfactual()
 
     # Plot the real and counterfactual iamges (i.e., Figure 3 of the paper).
     for dataset, weight_folder in DATASETS.items():
         visualise_generated_images(f"mnists/data/{dataset}_train.pth")
         visualise_generated_images(f"mnists/data/{dataset}_counterfactual.pth")
+
 
 def visualise_generated_images(path):
     images, labels = torch.load(path)
@@ -88,6 +91,7 @@ def visualise_generated_images(path):
     #TODO: Explain the permute.
     plt.imshow(grid.permute((1, 2, 0)))
     plt.show()
+
 
 if __name__ == "__main__":
     main()
