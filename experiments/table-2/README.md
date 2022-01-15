@@ -10,6 +10,14 @@ Results are reported in sheet `Table 2` in [this spreadsheet](https://docs.googl
 #### Setup datasets
 1. Download the datasets by following their commands to download. (Make sure you have `gdown`)
 
+Make all scripts executable: ```chmod +x  scripts/*```. Then, download the datasets (colored MNIST, Cue-Conflict, IN-9) and the pre-trained weights (CGN, U2-Net). Comment out the ones you don't need.
+
+```Shell
+cd cgn-framework/
+./scripts/download_data.sh
+./scripts/download_weights.sh
+```
+
 #### Train on original datasets
 
 1. Create tensor datasets for each of those

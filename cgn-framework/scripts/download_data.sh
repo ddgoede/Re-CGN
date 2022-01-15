@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 # Download Colored MNIST
-gdown https://drive.google.com/u/0/uc?export=download&confirm=rHtT&id=1NSv4RCSHjcHois3dXjYw_PaLIoVlLgXu
+gdown "https://drive.google.com/u/0/uc?export=download&confirm=rHtT&id=1NSv4RCSHjcHois3dXjYw_PaLIoVlLgXu"
 tar -xzvf colored_mnist.tar.gz
 mv colored_mnist mnists/data
 rm colored_mnist.tar.gz
 
 # Download BG challenge dataset
-wget https://github.com/MadryLab/backgrounds_challenge/releases/download/data/backgrounds_challenge_data.tar.gz
+wget "https://github.com/MadryLab/backgrounds_challenge/releases/download/data/backgrounds_challenge_data.tar.gz"
 tar -xzvf backgrounds_challenge_data.tar.gz
 mkdir imagenet/data/in9
 mv bg_challenge/* imagenet/data/in9
