@@ -14,7 +14,7 @@ from torchvision.utils import save_image
 
 from mnists.config import get_cfg_defaults
 from mnists.dataloader import get_dataloaders
-from mnists.models import Generator, DiscLin, DiscConv
+from mnists.models import Generator, DiscLin, DiscConv, GenLin
 from utils import save_cfg, load_cfg, children, hook_outputs, Optimizers
 from shared.losses import BinaryLoss, PerceptualLoss
 
@@ -117,11 +117,16 @@ def fit(cfg, generator, discriminator, dataloader, opts, losses, device):
 
 def main(cfg):
     # model init
-    generator = Generator(
+    # generator = Generator(
+    #     n_classes=cfg.MODEL.N_CLASSES,
+    #     latent_sz=cfg.MODEL.LATENT_SZ,
+    #     ngf=cfg.MODEL.NGF, init_type=cfg.MODEL.INIT_TYPE,
+    #     init_gain=cfg.MODEL.INIT_GAIN,
+    # )
+    generator = GenLin(
         n_classes=cfg.MODEL.N_CLASSES,
         latent_sz=cfg.MODEL.LATENT_SZ,
-        ngf=cfg.MODEL.NGF, init_type=cfg.MODEL.INIT_TYPE,
-        init_gain=cfg.MODEL.INIT_GAIN,
+        ngf=cfg.MODEL.NGF,
     )
     Discriminator = DiscLin if cfg.MODEL.DISC == 'linear' else DiscConv
     discriminator = Discriminator(n_classes=cfg.MODEL.N_CLASSES, ndf=cfg.MODEL.NDF)
@@ -129,9 +134,12 @@ def main(cfg):
     # get data
     dataloader, _ = get_dataloaders(cfg.TRAIN.DATASET, cfg.TRAIN.BATCH_SIZE,
                                     cfg.TRAIN.WORKERS)
+    # import ipdb; ipdb.set_trace()
+    # x = dataloader.dataset[0]['ims']
 
     # Loss functions
-    L_adv = torch.nn.MSELoss()
+    # L_adv = torch.nn.MSELoss()
+    L_adv = torch.nn.BCEWithLogitsLoss()
     losses = (L_adv,)
 
     # Optimizers

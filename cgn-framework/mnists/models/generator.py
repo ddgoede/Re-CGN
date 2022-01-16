@@ -92,7 +92,7 @@ class GenLin(nn.Module):
             nn.Linear(ngf, ngf),
             nn.LeakyReLU(0.2, inplace=True),
             nn.Linear(ngf, int(np.prod(img_shape))),
-            nn.Tanh()
+            # nn.Tanh()
         )
 
     def get_inp(self, ys):
