@@ -14,7 +14,7 @@ from torchvision.utils import save_image
 
 from mnists.config import get_cfg_defaults
 from mnists.dataloader import get_dataloaders
-from mnists.models import Generator, DiscLin, DiscConv, GenLin
+from mnists.models import Generator, DiscLin, DiscConv, GenLin, GenConv
 from utils import save_cfg, load_cfg, children, hook_outputs, Optimizers
 from shared.losses import BinaryLoss, PerceptualLoss
 
@@ -123,11 +123,17 @@ def main(cfg):
     #     ngf=cfg.MODEL.NGF, init_type=cfg.MODEL.INIT_TYPE,
     #     init_gain=cfg.MODEL.INIT_GAIN,
     # )
-    generator = GenLin(
+    # generator = GenLin(
+    #     n_classes=cfg.MODEL.N_CLASSES,
+    #     latent_sz=cfg.MODEL.LATENT_SZ,
+    #     ngf=cfg.MODEL.NGF,
+    # )
+    generator = GenConv(
         n_classes=cfg.MODEL.N_CLASSES,
         latent_sz=cfg.MODEL.LATENT_SZ,
         ngf=cfg.MODEL.NGF,
     )
+
     Discriminator = DiscLin if cfg.MODEL.DISC == 'linear' else DiscConv
     discriminator = Discriminator(n_classes=cfg.MODEL.N_CLASSES, ndf=cfg.MODEL.NDF)
 

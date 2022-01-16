@@ -107,6 +107,50 @@ class GenLin(nn.Module):
         return x_gen
 
 
+class GenConv(nn.Module):
+    """Convolutions generator.
+    Borrowed from DCGAN tutorial (PyTorch).
+    """
+    def __init__(self, n_classes=10, latent_sz=32, ngf=32, nc=3, img_shape=[3, 32, 32]):
+        super(GenConv, self).__init__()
+
+        self.n_classes = n_classes
+        self.latent_sz = latent_sz
+        inp_dim = self.latent_sz + self.n_classes
+        self.img_shape = img_shape
+
+        self.label_emb = nn.Embedding(n_classes, n_classes)
+        self.model = nn.Sequential(
+            # input is Z, going into a convolution
+            nn.ConvTranspose2d( inp_dim, ngf * 8, 4, 1, 0, bias=False),
+            nn.BatchNorm2d(ngf * 8),
+            nn.LeakyReLU(0.2, inplace=True),
+            # state size. (ngf*8) x 4 x 4
+            nn.ConvTranspose2d(ngf * 8, ngf * 4, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ngf * 4),
+            nn.LeakyReLU(0.2, inplace=True),
+            # state size. (ngf*4) x 8 x 8
+            nn.ConvTranspose2d( ngf * 4, ngf * 2, 4, 2, 1, bias=False),
+            nn.BatchNorm2d(ngf * 2),
+            nn.LeakyReLU(0.2, inplace=True),
+            # state size. (ngf*2) x 16 x 16
+            nn.ConvTranspose2d( ngf * 2, nc, 4, 2, 1, bias=False),
+            # state size. (nc) x 32 x 32
+            nn.Tanh()
+        )
+
+    def get_inp(self, ys):
+        u_vec = torch.normal(0, 1, (len(ys), self.latent_sz)).to(ys.device)
+        y_vec = self.label_emb(ys)
+        return torch.cat([u_vec, y_vec], -1)
+
+    def forward(self, ys=None):
+        inp = self.get_inp(ys)
+        inp = inp.view(inp.size(0), inp.size(1), 1, 1)
+        x_gen = self.model(inp)
+        return x_gen
+
+
 if __name__ == "__main__":
     # test conv generator
     G = Generator()
@@ -117,6 +161,12 @@ if __name__ == "__main__":
 
     # test linear generator
     G = GenLin()
+    print(G)
+    x_gen = G(ys)
+    assert x_gen.shape == torch.Size([10, 3, 32, 32])
+
+    # test conv generator
+    G = GenConv()
     print(G)
     x_gen = G(ys)
     assert x_gen.shape == torch.Size([10, 3, 32, 32])
