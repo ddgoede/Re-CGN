@@ -85,13 +85,13 @@ class GenLin(nn.Module):
 
         self.label_emb = nn.Embedding(n_classes, n_classes)
         self.model = nn.Sequential(
-            nn.Linear(inp_dim, ngf),
+            nn.Linear(inp_dim, 4 * ngf),
             nn.LeakyReLU(0.2, inplace=True),
-            nn.Linear(ngf, ngf),
+            nn.Linear(4 * ngf, 8 * ngf),
             nn.LeakyReLU(0.2, inplace=True),
-            nn.Linear(ngf, ngf),
+            nn.Linear(8 * ngf, 16 * ngf),
             nn.LeakyReLU(0.2, inplace=True),
-            nn.Linear(ngf, int(np.prod(img_shape))),
+            nn.Linear(16 * ngf, int(np.prod(img_shape))),
             # nn.Tanh()
         )
 
