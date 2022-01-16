@@ -74,10 +74,49 @@ class Generator(nn.Module):
         return x_gen
 
 
+class GenLin(nn.Module):
+    def __init__(self, n_classes=10, latent_sz=32, ngf=32, img_shape=[3, 32, 32]):
+        super(GenLin, self).__init__()
+
+        self.n_classes = n_classes
+        self.latent_sz = latent_sz
+        inp_dim = self.latent_sz + self.n_classes
+        self.img_shape = img_shape
+
+        self.label_emb = nn.Embedding(n_classes, n_classes)
+        self.model = nn.Sequential(
+            nn.Linear(inp_dim, ngf),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(ngf, ngf),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(ngf, ngf),
+            nn.LeakyReLU(0.2, inplace=True),
+            nn.Linear(ngf, int(np.prod(img_shape))),
+            nn.Tanh()
+        )
+
+    def get_inp(self, ys):
+        u_vec = torch.normal(0, 1, (len(ys), self.latent_sz)).to(ys.device)
+        y_vec = self.label_emb(ys)
+        return torch.cat([u_vec, y_vec], -1)
+
+    def forward(self, ys=None, counterfactual=False):
+        inp = self.get_inp(ys)
+        x_gen = self.model(inp)
+        x_gen = x_gen.view(x_gen.size(0), *self.img_shape)
+        return x_gen
+
+
 if __name__ == "__main__":
+    # test conv generator
     G = Generator()
     print(G)
-    
     ys = torch.randint(0, 10, (10,)).to(torch.device('cpu'))
+    x_gen = G(ys)
+    assert x_gen.shape == torch.Size([10, 3, 32, 32])
+
+    # test linear generator
+    G = GenLin()
+    print(G)
     x_gen = G(ys)
     assert x_gen.shape == torch.Size([10, 3, 32, 32])
