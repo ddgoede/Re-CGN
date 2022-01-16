@@ -1,4 +1,4 @@
-from experiment_utils import set_env, dotdict
+from experiment_utils import set_env
 set_env()
 
 from cgn_framework.imagenet import train_cgn, config
@@ -19,20 +19,6 @@ def disable_loss_from_config(cfg):
         cfg.LAMBDA.PERC = [0, 0, 0, 0]
 
 def main():
-    # cfg = config.get_cfg_defaults()
-
-    # args = object()
-    # args.model_name='tmp'
-    # args.weights_path=''
-    # args.sampled_fixed_noise=False
-    # args.save_singles=False
-    # args.truncation=1.0
-    # args.episodes=300
-    # args.batch_sz=1
-    # args.batch_acc=4000
-    # args.save_iter=4000
-    # args.log_losses=False
-
     parser = argparse.ArgumentParser()
     # Add arguments from original training script
     parser.add_argument('--model_name', default='tmp',
@@ -62,7 +48,6 @@ def main():
     args = parser.parse_args()
 
     cfg = config.get_cfg_defaults()
-    cfg.TRAIN.BATCH_SZ = 128
     cfg = train_cgn.merge_args_and_cfg(args, cfg)
     cfg.disable_loss = args.disable_loss
 
