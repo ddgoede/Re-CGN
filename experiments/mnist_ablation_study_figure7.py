@@ -1,14 +1,11 @@
 """
 Authors: Jesse Maas, Paul Hilders, Piyush Bagad, Danilo de Goede
 
-counterfactual_mnist.py
+mnist_ablation_study_figure7.py
 
-This program generates counterfactual images for the MNIST dataset
-and plots them. Datasets include colored MNIST, double-coloured MNIST
-and wilflife MNIST.
+This program attempts to reproduce the MNIST Ablation Study experiment from
+figure 7.
 """
-
-
 import torch
 from torchvision.utils import make_grid
 
@@ -27,7 +24,7 @@ from cgn_framework.mnists.generate_data import generate_cf_dataset, generate_dat
 from cgn_framework.mnists.train_classifier import main as classifier_main
 
 
-datasets = ["colored_MNIST_counterfactual", "double_colored_MNIST_counterfactual", "wildlife_MNIST_counterfactual"]
+DATASETS = ["colored_MNIST_counterfactual", "double_colored_MNIST_counterfactual", "wildlife_MNIST_counterfactual"]
 
 def calc_test_accuracy(**kwargs):
     args = dotdict(kwargs)
@@ -35,18 +32,24 @@ def calc_test_accuracy(**kwargs):
 
 
 def plot_figure7():
+    # Load the experiment results from the text file.
     with open("../experiments/figure7_data/mnist_ablation_study_results2.txt", 'rb') as fp:
         results = pickle.load(fp)
 
-    CF_ratios = [1, 5, 10]
+    CF_ratios = [1, 5, 10, 20]
     dataset_sizes = [10000, 100000, 1000000]
 
     fig, axs = plt.subplots(1, 3, figsize=(16,5))
     plt.setp(axs, xticks=[0, 1, 2], xticklabels=[r'$10^4$', r'$10^5$', r'$10^6$'])
     fig.suptitle('Figure 7 reproduced', fontsize=14)
 
-    for i, dataset in enumerate(datasets):
+    for i, dataset in enumerate(DATASETS):
         for CF_ratio in CF_ratios:
+            # Skip the CF_ratio of 20 for the colored MNIST dataset, as there are only 10 possible colors
+            # per shape.
+            if CF_ratio == 20 and dataset == "colored_MNIST_counterfactual":
+                continue
+
             line = []
             for size in dataset_sizes:
                 line.append(results[f"{dataset}_{size}_{CF_ratio}"])
@@ -60,13 +63,14 @@ def plot_figure7():
     plt.savefig('../experiments/figure7_data/figure7_reproduced.png')
 
 
-
 def main():
+    # The authors used 4 different CF_ratios and 3 different counterfactual dataset sizes for their
+    # experiment.
     CF_ratios = [1, 5, 10, 20]
     dataset_sizes = [10000, 100000, 1000000]
     accuracies = {}
 
-    for dataset in datasets:
+    for dataset in DATASETS:
         for (dataset_size, no_cfs) in list(itertools.product(dataset_sizes, CF_ratios)):
             # For colored MNIST, the maximum CF ratio is 10 as there are only 10 possible colors per shape.
             if dataset == "colored_MNIST_counterfactual" and no_cfs == 20:
@@ -79,11 +83,10 @@ def main():
             test_accuracy = calc_test_accuracy(dataset=dataset, batch_size=64, epochs=10, lr=1.0, gamma=0.7, log_interval=100)
             accuracies[f"{dataset}_{dataset_size}_{no_cfs}"] = test_accuracy
 
-            with open(f"mnist_ablation_study_results2.txt", 'wb') as fp:
+            # Results are stored in a text file. As running the entire experiment in one run
+            # is very time consuming, results are updated at every iteration.
+            with open(f"mnist_ablation_study_results.txt", 'wb') as fp:
                 pickle.dump(accuracies, fp, protocol=pickle.HIGHEST_PROTOCOL)
-
-    with open("mnist_ablation_study_results.txt", 'wb') as fp:
-        pickle.dump(accuracies, fp, protocol=pickle.HIGHEST_PROTOCOL)
 
 if __name__ == "__main__":
     # main()
