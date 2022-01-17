@@ -1,3 +1,6 @@
+# Media
+*.png
+
 # Slurm outputs
 cgn_framework/slurm/output_*.out
 
