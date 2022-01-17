@@ -1,3 +1,4 @@
+import os
 import argparse
 import repackage
 repackage.up()
@@ -70,6 +71,12 @@ def main(args):
         train(args, model, device, dl_train, optimizer, epoch)
         test(model, device, dl_test)
         scheduler.step()
+    
+    # save the final model
+    save_path = f'mnists/experiments/classifier_{args.dataset}/weights/ckp_epoch_{args.epochs}.pth'
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    print('Saving model to {}'.format(save_path))
+    torch.save(model.state_dict(), save_path)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
