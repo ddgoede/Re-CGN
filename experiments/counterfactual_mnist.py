@@ -27,7 +27,7 @@ DATASETS = {"colored_MNIST": "cgn_colored_MNIST",
             }
 
 
-def generate_counterfactual(dataset_size=100000, no_cfs=10):
+def generate_counterfactual(dataset_size=100000, no_cfs=10, skip_generation=True):
     """Generate the counterfactual images for the 3 datasets."""
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -48,7 +48,7 @@ def generate_counterfactual(dataset_size=100000, no_cfs=10):
         # Next, generate the counterfactual images.
         weight_path = f"mnists/experiments/{weight_folder}/weights/ckp.pth"
 
-        if os.path.exists(f"mnists/data/{dataset}_counterfactual.pth"):
+        if skip_generation and os.path.exists(f"mnists/data/{dataset}_counterfactual.pth"):
             print(f"'{dataset}_counterfactual.pth' already exist, skipping..")
         else:
             cgn = CGN()

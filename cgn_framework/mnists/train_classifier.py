@@ -49,9 +49,11 @@ def test(model, device, test_loader):
 
     test_loss /= len(test_loader.dataset)
 
+    test_accuracy = 100. * correct / len(test_loader.dataset)
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.3f}%)\n'.format(
-        test_loss, correct, len(test_loader.dataset),
-        100. * correct / len(test_loader.dataset)))
+        test_loss, correct, len(test_loader.dataset), test_accuracy))
+
+    return test_accuracy
 
 def main(args):
     # model and dataloader
@@ -68,8 +70,10 @@ def main(args):
 
     for epoch in range(1, args.epochs + 1):
         train(args, model, device, dl_train, optimizer, epoch)
-        test(model, device, dl_test)
+        test_accuracy = test(model, device, dl_test)
         scheduler.step()
+
+    return test_accuracy
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
