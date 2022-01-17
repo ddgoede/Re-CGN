@@ -26,8 +26,8 @@ def main(args):
 
     # load model and its weights from a checkpoint
     model = CNN()
-    print("Loading model weights from checkpoint: {}".format(args.ckpt_path))
-    ckpt = torch.load(os.path.join(REPO_PATH, "cgn_framework", args.ckpt_path), map_location='cpu')
+    print("Loading model weights from checkpoint: {}".format(args.weight_path))
+    ckpt = torch.load(os.path.join(REPO_PATH, "cgn_framework", args.weight_path), map_location='cpu')
     model.load_state_dict(ckpt)
     model = model.eval()
     model = model.to(device)
@@ -86,7 +86,7 @@ if __name__ == '__main__':
                         help='Provide dataset name.')
     parser.add_argument('--batch_size', type=int, default=16, metavar='N',
                         help='input batch size for training (default: 64)')
-    parser.add_argument('--ckpt_path', type=str, required=True,
+    parser.add_argument('--weight_path', type=str, required=True,
                         help='path to the classifier checkpoint')
     # parser.add_argument('--epochs', type=int, default=10, metavar='N',
     #                     help='number of epochs to train (default: 14)')
