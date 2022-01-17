@@ -88,14 +88,6 @@ if __name__ == '__main__':
                         help='input batch size for training (default: 64)')
     parser.add_argument('--weight_path', type=str, required=True,
                         help='path to the classifier checkpoint')
-    # parser.add_argument('--epochs', type=int, default=10, metavar='N',
-    #                     help='number of epochs to train (default: 14)')
-    # parser.add_argument('--lr', type=float, default=1.0, metavar='LR',
-    #                     help='learning rate (default: 1.0)')
-    # parser.add_argument('--gamma', type=float, default=0.7, metavar='M',
-    #                     help='Learning rate step gamma (default: 0.7)')
-    # parser.add_argument('--log-interval', type=int, default=100, metavar='N',
-    #                     help='how many batches to wait before logging training status')
     args = parser.parse_args()
 
     print(args)
