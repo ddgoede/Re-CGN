@@ -37,7 +37,19 @@ cd cgn-framework/
 2. Train the classifier
 
 #### Training on `Original + GAN`
-1. Currently, code for GAN is not available (architecture is also not known)
+1. Currently, code for GAN is not available (architecture is also not known). We added code for Generator(s) (`mnists/models/generator.py`) and for training GAN (`mnists/train_gan.py`).
+2. To train GAN, you need to run the following command:
+   ```bash
+   python mnists/train_gan.py --dataset colored_MNIST
+   ```
+   For dataset `wildlife_MNIST`, you need to run the following command:
+   ```bash
+   python mnists/train_gan.py --dataset wildlife_MNIST
+   ```
+   For dataset `double_colored_MNIST`, you need to run the following command:
+   ```bash
+   python mnists/train_gan.py --dataset double_colored_MNIST
+   ```
 
 
 #### Training `IRM` (invariance via model)
