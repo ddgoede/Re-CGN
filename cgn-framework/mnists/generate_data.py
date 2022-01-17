@@ -6,8 +6,33 @@ import repackage
 repackage.up()
 
 from mnists.train_cgn import CGN
+from mnists.train_gan import GenConv
 from mnists.dataloader import get_dataloaders
 from utils import load_cfg
+
+
+def generate_gan_dataset(generator, path, dataset_size, no_cfs, device):
+    x, y = [], []
+    generator.batch_size = 100
+    n_classes = 10
+
+    total_iters = int(dataset_size // generator.batch_size // no_cfs)
+    for _ in trange(total_iters):
+
+        # generate initial mask
+        y_gen = torch.randint(n_classes, (generator.batch_size,)).to(device)
+
+        # generate data from GAN, i.e., sample multiple times from the generator
+        for _ in range(no_cfs):
+            x_gen = generator(y_gen)
+
+            x.append(x_gen.detach().cpu())
+            y.append(y_gen.detach().cpu())
+
+    dataset = [torch.cat(x), torch.cat(y)]
+    print(f"x shape {dataset[0].shape}, y shape {dataset[1].shape}")
+    torch.save(dataset, 'mnists/data/' + path)
+
 
 def generate_cf_dataset(cgn, path, dataset_size, no_cfs, device):
     x, y = [], []
@@ -71,16 +96,34 @@ if __name__ == "__main__":
         generate_dataset(dl=dl_train, path=args.dataset + '_train.pth')
         generate_dataset(dl=dl_test, path=args.dataset + '_test.pth')
 
-    # Generate counterfactual dataset
     else:
-        # load model
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        cgn = CGN()
-        cgn.load_state_dict(torch.load(args.weight_path, 'cpu'))
-        cgn.to(device).eval()
+        # Generate counterfactual dataset
+        if "cgn_" in args.weight_path:
+            # load model
+            device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+            cgn = CGN()
+            cgn.load_state_dict(torch.load(args.weight_path, 'cpu'))
+            cgn.to(device).eval()
 
-        # generate
-        print(f"Generating the counterfactual {args.dataset} of size {args.dataset_size}")
-        generate_cf_dataset(cgn=cgn, path=args.dataset + '_counterfactual.pth',
-                            dataset_size=args.dataset_size, no_cfs=args.no_cfs,
-                            device=device)
+            # generate
+            print(f"Generating the counterfactual {args.dataset} of size {args.dataset_size}")
+            generate_cf_dataset(cgn=cgn, path=args.dataset + '_counterfactual.pth',
+                                dataset_size=args.dataset_size, no_cfs=args.no_cfs,
+                                device=device)
+        elif "gan_" in args.weight_path:
+            device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+            generator = GenConv()
+            generator.load_state_dict(torch.load(args.weight_path, 'cpu'))
+            generator.to(device).eval()
+
+            # generate
+            print(f"Generating the GAN {args.dataset} of size {args.dataset_size}")
+            generate_gan_dataset(
+                generator=generator,
+                path=args.dataset + '_gan.pth',
+                dataset_size=args.dataset_size,
+                no_cfs=args.no_cfs,
+                device=device,
+            )
+        else:
+            raise ValueError(f"Unknown model type for {args.weight_path}.")

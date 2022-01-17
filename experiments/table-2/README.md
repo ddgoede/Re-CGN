@@ -50,6 +50,12 @@ cd cgn-framework/
    ```bash
    python mnists/train_gan.py --dataset double_colored_MNIST
    ```
+3. To generate data using a GAN, you can use the following commands. Note that we have added pretrained GAN checkpoints at relevant locations.
+   ```bash
+   python mnists/generate_data.py --dataset colored_MNIST --weight_path mnists/experiments/gan_colored_MNIST/weights/ckp.pth
+   python mnists/generate_data.py --dataset double_colored_MNIST --weight_path mnists/experiments/gan_double_colored_MNIST/weights/ckp.pth
+   python mnists/generate_data.py --dataset wildlife_MNIST --weight_path mnis/experiments/gan_wildlife_MNIST/weights/ckp.pth
+   ```
 
 
 #### Training `IRM` (invariance via model)
