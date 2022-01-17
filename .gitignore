@@ -1,5 +1,5 @@
 # Slurm outputs
-cgn-framework/slurm/output_*.out
+cgn_framework/slurm/output_*.out
 
 # IDE's
 .vscode

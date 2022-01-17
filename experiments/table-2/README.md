@@ -13,7 +13,7 @@ Results are reported in sheet `Table 2` in [this spreadsheet](https://docs.googl
 Make all scripts executable: ```chmod +x  scripts/*```. Then, download the datasets (colored MNIST, Cue-Conflict, IN-9) and the pre-trained weights (CGN, U2-Net). Comment out the ones you don't need.
 
 ```Shell
-cd cgn-framework/
+cd cgn_framework/
 ./scripts/download_data.sh
 ./scripts/download_weights.sh
 ```
@@ -22,7 +22,7 @@ cd cgn-framework/
 
 1. Create tensor datasets for each of those
    ```bash
-   cd cgn-framework/
+   cd cgn_framework/
    python mnists/generate_data.py --dataset colored_MNIST
    python mnists/generate_data.py --dataset double_colored_MNIST
    python mnists/generate_data.py --dataset wildlife_MNIST
