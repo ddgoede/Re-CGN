@@ -184,9 +184,9 @@ def get_dataloaders(dataset, batch_size, workers):
 
     return dl_train, dl_test
 
-TENSOR_DATASETS = ['colored_MNIST', 'colored_MNIST_counterfactual',
-                   'double_colored_MNIST', 'double_colored_MNIST_counterfactual',
-                   'wildlife_MNIST', 'wildlife_MNIST_counterfactual']
+TENSOR_DATASETS = ['colored_MNIST', 'colored_MNIST_counterfactual', 'colored_MNIST_gan',
+                   'double_colored_MNIST', 'double_colored_MNIST_counterfactual', 'double_colored_MNIST_gan',
+                   'wildlife_MNIST', 'wildlife_MNIST_counterfactual', 'wildlife_MNIST_gan']
 
 def get_tensor_dataloaders(dataset, batch_size=64):
     assert dataset in TENSOR_DATASETS, f"Unknown datasets {dataset}"
@@ -195,6 +195,10 @@ def get_tensor_dataloaders(dataset, batch_size=64):
         tensor = torch.load(f'mnists/data/{dataset}.pth')
         ds_train = TensorDataset(*tensor[:2])
         dataset = dataset.replace('_counterfactual', '')
+    elif 'gan' in dataset:
+        tensor = torch.load(f'mnists/data/{dataset}.pth')
+        ds_train = TensorDataset(*tensor[:2])
+        dataset = dataset.replace('_gan', '')
     else:
         ds_train = TensorDataset(*torch.load(f'mnists/data/{dataset}_train.pth'))
     ds_test = TensorDataset(*torch.load(f'mnists/data/{dataset}_test.pth'))

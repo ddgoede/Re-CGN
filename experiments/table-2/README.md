@@ -56,6 +56,10 @@ cd cgn-framework/
    python mnists/generate_data.py --dataset double_colored_MNIST --weight_path mnists/experiments/gan_double_colored_MNIST/weights/ckp.pth
    python mnists/generate_data.py --dataset wildlife_MNIST --weight_path mnis/experiments/gan_wildlife_MNIST/weights/ckp.pth
    ```
+4. Train the classifier (replace dataset with the dataset you want to train on)
+   ```bash
+   python mnists/train_classifier.py --dataset colored_MNIST_gan
+   ```
 
 
 #### Training `IRM` (invariance via model)
