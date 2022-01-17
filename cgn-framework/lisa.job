@@ -5,7 +5,7 @@
 #SBATCH --job-name=SampleJob
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
-#SBATCH --time=02:00:00
+#SBATCH --time=10:00:00
 #SBATCH --mem=32000M
 #SBATCH --output=slurm/output_%A.out
 
@@ -17,4 +17,6 @@ module load Anaconda3/2021.05
 source deactivate
 source activate gcn-gpu
 # Run your code
-python mnists/train_gan.py --cfg mnists/experiments/gan_colored_MNIST/cfg.yaml
+# python mnists/train_gan.py --cfg mnists/experiments/gan_colored_MNIST/cfg.yaml
+# python mnists/train_gan.py --cfg mnists/experiments/gan_double_colored_MNIST/cfg.yaml
+python mnists/train_gan.py --cfg mnists/experiments/gan_wildlife_MNIST/cfg.yaml
