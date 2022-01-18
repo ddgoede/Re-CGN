@@ -143,6 +143,9 @@ def sample_classes(mode, classes=None):
     if mode == 'random':
         return np.random.randint(0, 1000, 3).tolist()
 
+    elif mode == 'random_same':
+        return [np.random.randint(0, 1000)] * 3
+
     elif mode == 'best_classes':
         return [np.random.choice(MASKS),
                 np.random.choice(FOREGROUND),
@@ -183,6 +186,8 @@ def main(args):
     csv_path = join(data_path, 'labels.csv')
     df.to_csv(csv_path)
 
+    mean_masks = []
+
     # generate data
     with torch.no_grad():
         for i in trange(args.n_data):
@@ -199,6 +204,9 @@ def main(args):
                 x_gt, mask, premask, foreground, background, bg_mask = cgn(ys=ys)
                 x_gen = mask * foreground + (1 - mask) * background
 
+                mean_mask = mask.mean()
+                mean_masks.append(mean_mask)
+
                 # save image
                 # to save other outputs, simply add a line in the same format, e.g.:
                 # save_image(premask, join(ims_path, im_name + '_premask.jpg'))
@@ -211,7 +219,7 @@ def main(args):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--mode', type=str, required=True,
-                        choices=['random', 'best_classes', 'fixed_classes'],
+                        choices=['random', 'random_same', 'best_classes', 'fixed_classes'],
                         help='Choose between random sampling, sampling from the best ' +
                         'classes or the classes passed to args.classes')
     parser.add_argument('--n_data', type=int, required=True,

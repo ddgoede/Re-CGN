@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 from datetime import datetime
 import os
 
-from experiment_utils import set_env, dotdict
+from experiment_utils import set_env, dotdict, load_generated_imagenet
 set_env()
 
 from cgn_framework.imagenet.generate_data import main as generate_main
@@ -34,11 +34,8 @@ def main():
     data_path = os.path.join('imagenet', 'data', time_str + trunc_str)
     images_dir = os.path.join(data_path, 'ims')
 
-    # Get the locations of the generated images
-    image_paths = (images_dir + "/" + path for path, _ in zip(os.listdir(images_dir), range(examples_count)))
-
     # Construct a grid with the generated images
-    images = [torchvision.io.read_image(path) for path in image_paths]
+    images = load_generated_imagenet(images_dir, examples_count)
     image_grid = make_grid(images, nrow=examples_count)
 
     plt.imshow(image_grid.permute(1, 2, 0))
