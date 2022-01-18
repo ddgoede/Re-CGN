@@ -13,7 +13,7 @@ from gradcam import GradCAM, GradCAMpp
 import warnings
 warnings.filterwarnings("ignore")
 
-from experiment_utils import set_env, REPO_PATH
+from experiment_utils import set_env, REPO_PATH, seed_everything
 set_env()
 
 from cgn_framework.mnists.models.classifier import CNN
@@ -22,6 +22,8 @@ from cgn_framework.mnists.dataloader import get_tensor_dataloaders, TENSOR_DATAS
 
 
 def main(args):
+    seed_everything(args.seed)
+
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # load model and its weights from a checkpoint
@@ -71,13 +73,7 @@ def main(args):
 
         # save result for this image
         path = save_path.replace("test_samples", f"test_sample_{i}_gradcam")
-        save_image([image.data, heatmap, result], path, nrow=3, padding=0, normalize=True)
-    
-
-
-
-
-
+        save_image([image.data.cpu(), heatmap, result], path, nrow=3, padding=0, normalize=True)
 
 
 if __name__ == '__main__':
@@ -86,6 +82,8 @@ if __name__ == '__main__':
                         help='Provide dataset name.')
     parser.add_argument('--batch_size', type=int, default=16, metavar='N',
                         help='input batch size for training (default: 64)')
+    parser.add_argument('--seed', type=int, default=0,
+                        help='random seed')
     parser.add_argument('--weight_path', type=str, required=True,
                         help='path to the classifier checkpoint')
     args = parser.parse_args()

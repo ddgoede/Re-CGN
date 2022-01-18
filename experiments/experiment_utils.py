@@ -1,5 +1,8 @@
 import os, sys
 from os.path import join, dirname, abspath
+import random
+import numpy as np
+import torch
 
 
 REPO_PATH = dirname(dirname(abspath(__file__)))
@@ -14,8 +17,22 @@ def set_env():
     sys.path.insert(1, join(REPO_PATH, 'cgn_framework'))
     os.chdir(join(REPO_PATH, "cgn_framework"))
 
+
 class dotdict(dict):
     """dot.notation access to dictionary attributes"""
     __getattr__ = dict.get
     __setattr__ = dict.__setitem__
     __delattr__ = dict.__delitem__
+
+
+def seed_everything(seed):
+    """Fixes random seed for all modules in the framework."""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+

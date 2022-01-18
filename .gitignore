@@ -3,6 +3,7 @@
 
 # Slurm outputs
 cgn_framework/slurm/output_*.out
+*/slurm/output_*.out
 
 # IDE's
 .vscode
