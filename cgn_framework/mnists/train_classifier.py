@@ -57,7 +57,7 @@ def test(model, device, test_loader):
 def main(args):
     # model and dataloader
     model = CNN()
-    dl_train, dl_test = get_tensor_dataloaders(args.dataset, args.batch_size)
+    dl_train, dl_test = get_tensor_dataloaders(args.dataset, args.batch_size, combined=args.combined)
 
     # Optimizer
     optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
@@ -73,7 +73,8 @@ def main(args):
         scheduler.step()
     
     # save the final model
-    save_path = f'mnists/experiments/classifier_{args.dataset}/weights/ckp_epoch_{args.epochs}.pth'
+    dataset_suffix = (args.dataset) if not args.combined else (args.dataset + "_combined")
+    save_path = f'mnists/experiments/classifier_{dataset_suffix}/weights/ckp_epoch_{args.epochs}.pth'
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     print('Saving model to {}'.format(save_path))
     torch.save(model.state_dict(), save_path)
@@ -82,6 +83,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', type=str, required=True, choices=TENSOR_DATASETS,
                         help='Provide dataset name.')
+    parser.add_argument('--combined', action='store_true',
+                        help='If set, train on both original and generated data.')
     parser.add_argument('--batch_size', type=int, default=64, metavar='N',
                         help='input batch size for training (default: 64)')
     parser.add_argument('--epochs', type=int, default=10, metavar='N',

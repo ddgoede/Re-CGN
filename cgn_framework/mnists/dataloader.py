@@ -184,19 +184,43 @@ def get_dataloaders(dataset, batch_size, workers):
 
     return dl_train, dl_test
 
-TENSOR_DATASETS = ['colored_MNIST', 'colored_MNIST_counterfactual', 'colored_MNIST_gan',
-                   'double_colored_MNIST', 'double_colored_MNIST_counterfactual', 'double_colored_MNIST_gan',
-                   'wildlife_MNIST', 'wildlife_MNIST_counterfactual', 'wildlife_MNIST_gan']
+TENSOR_DATASETS = [
+    'colored_MNIST',
+    'colored_MNIST_counterfactual',
+    'colored_MNIST_gan',
+    'double_colored_MNIST',
+    'double_colored_MNIST_counterfactual',
+    'double_colored_MNIST_gan',
+    'wildlife_MNIST',
+    'wildlife_MNIST_counterfactual',
+    'wildlife_MNIST_gan',
+]
 
-def get_tensor_dataloaders(dataset, batch_size=64):
+def get_tensor_dataloaders(dataset, batch_size=64, combined=False):
     assert dataset in TENSOR_DATASETS, f"Unknown datasets {dataset}"
 
     if 'counterfactual' in dataset:
         tensor = torch.load(f'mnists/data/{dataset}.pth')
+
+        if combined:
+            # training data: original + counterfactual
+            dataset_name = dataset.replace("counterfactual", "train")
+            tensor_original_data = torch.load(f'mnists/data/{dataset_name}.pth')
+            tensor[0] = torch.cat([tensor_original_data[0], tensor[0]], dim=0)
+            tensor[1] = torch.cat([tensor_original_data[1], tensor[1]], dim=0)
+
         ds_train = TensorDataset(*tensor[:2])
         dataset = dataset.replace('_counterfactual', '')
     elif 'gan' in dataset:
         tensor = torch.load(f'mnists/data/{dataset}.pth')
+
+        if combined:
+            # training data: original + GAN-generated
+            dataset_name = dataset.replace("gan", "train")
+            tensor_original_data = torch.load(f'mnists/data/{dataset_name}.pth')
+            tensor[0] = torch.cat([tensor_original_data[0], tensor[0]], dim=0)
+            tensor[1] = torch.cat([tensor_original_data[1], tensor[1]], dim=0)
+
         ds_train = TensorDataset(*tensor[:2])
         dataset = dataset.replace('_gan', '')
     else:

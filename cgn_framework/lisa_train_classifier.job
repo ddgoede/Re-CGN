@@ -19,27 +19,35 @@ source activate gcn-gpu
 
 # Run your code
 
-echo "=========== Vanilla MNIST variants ==========="
-python mnists/train_classifier.py --dataset colored_MNIST
-echo "------- Done with colored_MNIST --------"
-python mnists/train_classifier.py --dataset double_colored_MNIST
-echo "------- Done with double_colored_MNIST --------"
-python mnists/train_classifier.py --dataset wildlife_MNIST
-echo "------- Done with wildlife_MNIST --------"
+# echo "=========== Vanilla MNIST variants ==========="
+# python mnists/train_classifier.py --dataset colored_MNIST
+# echo "------- Done with colored_MNIST --------"
+# python mnists/train_classifier.py --dataset double_colored_MNIST
+# echo "------- Done with double_colored_MNIST --------"
+# python mnists/train_classifier.py --dataset wildlife_MNIST
+# echo "------- Done with wildlife_MNIST --------"
 
-echo "=========== CGN MNIST variants ==========="
-python mnists/train_classifier.py --dataset colored_MNIST_counterfactual
-echo "------- Done with colored_MNIST --------"
-python mnists/train_classifier.py --dataset double_colored_MNIST_counterfactual
-echo "------- Done with double_colored_MNIST --------"
+# echo "=========== CGN MNIST variants ==========="
+# python mnists/train_classifier.py --dataset colored_MNIST_counterfactual
+# echo "------- Done with colored_MNIST --------"
+# python mnists/train_classifier.py --dataset double_colored_MNIST_counterfactual
+# echo "------- Done with double_colored_MNIST --------"
 python mnists/train_classifier.py --dataset wildlife_MNIST_counterfactual
-echo "------- Done with wildlife_MNIST --------"
+# echo "------- Done with wildlife_MNIST --------"
 
-echo "=========== GAN MNIST variants ==========="
-python mnists/train_classifier.py --dataset colored_MNIST_gan
-echo "------- Done with colored_MNIST --------"
-python mnists/train_classifier.py --dataset double_colored_MNIST_gan
-echo "------- Done with double_colored_MNIST --------"
-python mnists/train_classifier.py --dataset wildlife_MNIST_gan
-echo "------- Done with wildlife_MNIST --------"
+# echo "=========== GAN MNIST variants ==========="
+# python mnists/train_classifier.py --dataset colored_MNIST_gan
+# echo "------- Done with colored_MNIST --------"
+# python mnists/train_classifier.py --dataset double_colored_MNIST_gan
+# echo "------- Done with double_colored_MNIST --------"
+# python mnists/train_classifier.py --dataset wildlife_MNIST_gan
+# echo "------- Done with wildlife_MNIST --------"
 
+# train on combined (original + generated counterfactuals)
+# python mnists/train_classifier.py --combined --dataset colored_MNIST_counterfactual
+# python mnists/train_classifier.py --combined --dataset double_colored_MNIST_counterfactual
+# python mnists/train_classifier.py --combined --dataset wildlife_MNIST_counterfactual
+
+# python mnists/train_classifier.py --combined --dataset colored_MNIST_gan
+# python mnists/train_classifier.py --combined --dataset double_colored_MNIST_gan
+# python mnists/train_classifier.py --combined --dataset wildlife_MNIST_gan
