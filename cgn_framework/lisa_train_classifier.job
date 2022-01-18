@@ -16,10 +16,30 @@ module load Anaconda3/2021.05
 # Activate your environment
 source deactivate
 source activate gcn-gpu
+
 # Run your code
-# python mnists/train_classifier.py --dataset colored_MNIST_gan
-# echo "------- Done with colored_MNIST --------"
+
+echo "=========== Vanilla MNIST variants ==========="
+python mnists/train_classifier.py --dataset colored_MNIST
+echo "------- Done with colored_MNIST --------"
+python mnists/train_classifier.py --dataset double_colored_MNIST
+echo "------- Done with double_colored_MNIST --------"
+python mnists/train_classifier.py --dataset wildlife_MNIST
+echo "------- Done with wildlife_MNIST --------"
+
+echo "=========== CGN MNIST variants ==========="
+python mnists/train_classifier.py --dataset colored_MNIST_counterfactual
+echo "------- Done with colored_MNIST --------"
+python mnists/train_classifier.py --dataset double_colored_MNIST_counterfactual
+echo "------- Done with double_colored_MNIST --------"
+python mnists/train_classifier.py --dataset wildlife_MNIST_counterfactual
+echo "------- Done with wildlife_MNIST --------"
+
+echo "=========== GAN MNIST variants ==========="
+python mnists/train_classifier.py --dataset colored_MNIST_gan
+echo "------- Done with colored_MNIST --------"
 python mnists/train_classifier.py --dataset double_colored_MNIST_gan
 echo "------- Done with double_colored_MNIST --------"
-# python mnists/train_classifier.py --dataset wildlife_MNIST_gan
-# echo "------- Done with wildlife_MNIST --------"
+python mnists/train_classifier.py --dataset wildlife_MNIST_gan
+echo "------- Done with wildlife_MNIST --------"
+
