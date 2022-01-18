@@ -21,6 +21,21 @@ source activate gcn-gpu
 # dataset=colored_MNIST
 # weight_path=mnists/experiments/gan_double_colored_MNIST/weights/ckp.pth
 # dataset=double_colored_MNIST
-weight_path=mnists/experiments/gan_wildlife_MNIST/weights/ckp.pth
+# weight_path=mnists/experiments/gan_wildlife_MNIST/weights/ckp.pth
+# dataset=wildlife_MNIST
+
+weight_path=mnists/experiments/cgn_colored_MNIST/weights/ckp.pth
+dataset=colored_MNIST
+echo "Generating data for $dataset with $weight_path"
+python mnists/generate_data.py --weight_path $weight_path --dataset $dataset
+
+
+weight_path=mnists/experiments/cgn_double_colored_MNIST/weights/ckp.pth
+dataset=double_colored_MNIST
+echo "Generating data for $dataset with $weight_path"
+python mnists/generate_data.py --weight_path $weight_path --dataset $dataset
+
+weight_path=mnists/experiments/cgn_wildlife_MNIST/weights/ckp.pth
 dataset=wildlife_MNIST
+echo "Generating data for $dataset with $weight_path"
 python mnists/generate_data.py --weight_path $weight_path --dataset $dataset
