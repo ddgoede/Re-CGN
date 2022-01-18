@@ -25,6 +25,7 @@ from cgn_framework.mnists.train_classifier import main as classifier_main
 
 
 DATASETS = ["colored_MNIST_counterfactual", "double_colored_MNIST_counterfactual", "wildlife_MNIST_counterfactual"]
+DATASET_NAMES = ["Colored MNIST", "Double-Colored MNIST", "Wildlife MNIST"]
 
 def calc_test_accuracy(**kwargs):
     args = dotdict(kwargs)
@@ -33,7 +34,7 @@ def calc_test_accuracy(**kwargs):
 
 def plot_figure7():
     # Load the experiment results from the text file.
-    with open("../experiments/figure7_data/mnist_ablation_study_results2.txt", 'rb') as fp:
+    with open("../experiments/figure7_data/mnist_ablation_study_results.txt", 'rb') as fp:
         results = pickle.load(fp)
 
     CF_ratios = [1, 5, 10, 20]
@@ -41,7 +42,6 @@ def plot_figure7():
 
     fig, axs = plt.subplots(1, 3, figsize=(16,5))
     plt.setp(axs, xticks=[0, 1, 2], xticklabels=[r'$10^4$', r'$10^5$', r'$10^6$'])
-    fig.suptitle('Figure 7 reproduced', fontsize=14)
 
     for i, dataset in enumerate(DATASETS):
         for CF_ratio in CF_ratios:
@@ -56,11 +56,11 @@ def plot_figure7():
             axs[i].plot(np.arange(3), line, label=f'CF ratio = {CF_ratio}', marker='o')
             axs[i].set_xlabel("Num Counterfactual Datapoints")
             axs[i].set_ylabel("Test Accuracy (%)")
-            axs[i].grid()
+            axs[i].grid(True)
             axs[i].legend()
-        break
+        axs[i].set_title(DATASET_NAMES[i])
     plt.plot()
-    plt.savefig('../experiments/figure7_data/figure7_reproduced.png')
+    plt.savefig('../experiments/figure7_data/figure7_reproduced.png', bbox_inches='tight')
 
 
 def main():
