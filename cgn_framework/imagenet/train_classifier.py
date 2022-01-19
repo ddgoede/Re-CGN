@@ -168,10 +168,10 @@ def main_worker(gpu, ngpus_per_node, args):
     
 
     ### dataloaders
-    train_loader, val_loader, train_sampler = get_imagenet_dls(args.distributed, args.batch_size, args.workers)
+    train_loader, val_loader, train_sampler = get_imagenet_dls(args.data, args.distributed, args.batch_size, args.workers)
     cf_train_loader, cf_val_loader, cf_train_sampler = get_cf_imagenet_dls(args.cf_data, args.cf_ratio, len(train_loader), args.distributed, args.batch_size, args.workers)
     dl_shape_bias = get_cue_conflict_dls(args.batch_size, args.workers)
-    dls_in9 = get_in9_dls(args.distributed, args.batch_size, args.workers, ['mixed_rand', 'mixed_same'])
+    dls_in9 = get_in9_dls(args.distributed, args.batch_size, args.workers, ['original', 'mixed_rand', 'mixed_same'])
 
     
     # eval before training
@@ -206,7 +206,9 @@ def main_worker(gpu, ngpus_per_node, args):
                                dl_shape_bias, dls_in9, args)
 
         # remember best acc@1 and save checkpoint
-        acc1_overall = metrics['acc1/0_overall']
+        # acc1_overall = metrics['acc1/0_overall']
+        # BUGFIX: there is no key for overall acc1, instead we use acc1/1_real
+        acc1_overall = metrics['acc1/1_real']
         is_best = acc1_overall > best_acc1_overall
         best_acc1_overall = max(acc1_overall, best_acc1_overall)
 
@@ -472,6 +474,8 @@ def validate_in_9(dls_in9, model):
 
     # BG gap for the prediction without the background
     res['in_9_gaps/bg_gap'] = res['in_9_acc1_mixed_same/shape_texture'] - res['in_9_acc1_mixed_rand/shape_texture']
+    print("** in_9_gaps/bg_gap: ", res['in_9_gaps/bg_gap'])
+
     return res
 
 
