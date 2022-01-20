@@ -165,7 +165,7 @@ def main_worker(gpu, ngpus_per_node, args):
             print("=> no checkpoint found at '{}'".format(args.resume))
 
     cudnn.benchmark = True
-    
+
 
     ### dataloaders
     train_loader, val_loader, train_sampler = get_imagenet_dls(args.distributed, args.batch_size, args.workers)
@@ -173,7 +173,7 @@ def main_worker(gpu, ngpus_per_node, args):
     dl_shape_bias = get_cue_conflict_dls(args.batch_size, args.workers)
     dls_in9 = get_in9_dls(args.distributed, args.batch_size, args.workers, ['mixed_rand', 'mixed_same'])
 
-    
+
     # eval before training
     if not args.resume:
         metrics = validate(model, val_loader, cf_val_loader,
@@ -206,7 +206,7 @@ def main_worker(gpu, ngpus_per_node, args):
                                dl_shape_bias, dls_in9, args)
 
         # remember best acc@1 and save checkpoint
-        acc1_overall = metrics['acc1/0_overall']
+        acc1_overall = 0 # metrics['acc1/0_overall']
         is_best = acc1_overall > best_acc1_overall
         best_acc1_overall = max(acc1_overall, best_acc1_overall)
 
@@ -551,7 +551,7 @@ def accuracy(output, target, topk=(1,)):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
-    parser.add_argument('--data', default='data/ImageNet', 
+    parser.add_argument('--data', default='data/ImageNet',
                         help='path to dataset')
     parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet18',
                         choices=model_names,

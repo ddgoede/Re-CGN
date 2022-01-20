@@ -1,6 +1,6 @@
 from os import pread
 import torch
-from torch import nn
+from torch import device, nn
 from torch.autograd import Variable
 from torch.nn import functional as F
 import torch.utils.data
@@ -35,17 +35,17 @@ def inception_score(imgs, cuda=True, batch_size=32, resize=False, splits=1):
     dataloader = torch.utils.data.DataLoader(imgs, batch_size=batch_size)
 
     # Load inception model
-    inception_model = inception_v3(pretrained=True, transform_input=False).type(dtype)
+    inception_model = inception_v3(pretrained=True).type(dtype)
     inception_model.eval()
     up = nn.Upsample(size=(299, 299), mode='bilinear').type(dtype)
     def get_pred(x):
         if resize:
             x = up(x)
-        x = inception_model(x).to(torch.float64)
+        x = inception_model(x)
         return F.softmax(x).data.cpu().numpy()
 
     # Get predictions
-    preds = np.zeros((N, 1000), dtype=np.float64)
+    preds = np.zeros((N, 1000))
 
     for i, batch in enumerate(dataloader, 0):
         batch = batch.type(dtype)
