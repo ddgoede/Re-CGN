@@ -67,6 +67,7 @@ def main(args):
 
     # for metric computation
     jaccard = JaccardIndex(num_classes=2)
+    jaccard = jaccard.to(device)
 
     # apply GradCAM on the test set
     iterator = tqdm(
@@ -74,6 +75,7 @@ def main(args):
         colour="red",
         bar_format='{l_bar}{bar:10}{r_bar}{bar:-10b}',
         desc="Computing GradCAM",
+        disable=args.disable_tqdm,
     )
     iou_values = []
     labels = []
@@ -82,18 +84,20 @@ def main(args):
 
         # get image
         image, label = ds_test[i]
+        image = image.to(device)
 
         # get gradcam mask
         gc_mask, _ = gradcam(image.unsqueeze(0))
         heatmap, result = visualize_cam(gc_mask, image)
-        gc_mask = gc_mask.squeeze(0)
+        gc_mask = gc_mask.squeeze(0).to(device)
 
         # get coresponding GT mask from original dataset
         gt_mask = original[i][0]
+        gt_mask = gt_mask.to(device)
         gt_mask_binary = gt_mask > 0.5
 
         iou = jaccard(gc_mask, gt_mask_binary)
-        iou_values.append(iou)
+        iou_values.append(iou.cpu().item())
         labels.append(label)
         
         if show:
@@ -107,7 +111,8 @@ def main(args):
     df["label"] = torch.stack(labels).numpy()
 
     class_wise_results = dict(df.groupby("label")["iou"].mean())
-    class_wise_results["overall"] = np.mean(iou_values)
+    class_wise_results["overall_mean"] = np.mean(iou_values)
+    class_wise_results["overall_std"] = np.std(iou_values)
 
     return class_wise_results
 
@@ -122,6 +127,9 @@ if __name__ == '__main__':
                         help='random seed')
     parser.add_argument('--weight_path', type=str, required=True,
                         help='path to the classifier checkpoint')
+    parser.add_argument('--disable_tqdm', action='store_true',
+                        help='disable tqdm progress bar')
+
     args = parser.parse_args()
 
     print("::::: Configs :::::")
@@ -136,7 +144,7 @@ if __name__ == '__main__':
         REPO_PATH,
         "experiments",
         "results",
-        f"{args.dataset}_{args.model}_gradcam_iou.pth",
+        f"{args.dataset}_{args.model}_seed_{args.seed}_gradcam_iou.pth",
     )
     torch.save(results, save_path)
 

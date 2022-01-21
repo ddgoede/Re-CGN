@@ -53,6 +53,10 @@ def test(model, device, test_loader):
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.3f}%)\n'.format(
         test_loss, correct, len(test_loader.dataset),
         100. * correct / len(test_loader.dataset)))
+    
+    test_acc = 100. * correct / len(test_loader.dataset)
+    return test_acc
+
 
 def main(args):
     # model and dataloader
@@ -67,17 +71,26 @@ def main(args):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = model.to(device)
 
+    test_accs = dict()
     for epoch in range(1, args.epochs + 1):
         train(args, model, device, dl_train, optimizer, epoch)
-        test(model, device, dl_test)
+        test_acc = test(model, device, dl_test)
+        test_accs[epoch] = test_acc
         scheduler.step()
     
     # save the final model
     dataset_suffix = (args.dataset) if not args.combined else (args.dataset + "_combined")
+    dataset_suffix += "_seed_" + str(args.seed) if args.seed is not None else ""
     save_path = f'mnists/experiments/classifier_{dataset_suffix}/weights/ckp_epoch_{args.epochs}.pth'
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     print('Saving model to {}'.format(save_path))
     torch.save(model.state_dict(), save_path)
+
+    # save the test accuracy
+    save_path = f'mnists/experiments/classifier_{dataset_suffix}/test_accs.pth'
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    print('Saving test accuracy to {}'.format(save_path))
+    torch.save(test_accs, save_path)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -95,6 +108,8 @@ if __name__ == '__main__':
                         help='Learning rate step gamma (default: 0.7)')
     parser.add_argument('--log-interval', type=int, default=100, metavar='N',
                         help='how many batches to wait before logging training status')
+    parser.add_argument('--seed', type=int, default=None,
+                        help='random seed')
     args = parser.parse_args()
 
     print(args)
