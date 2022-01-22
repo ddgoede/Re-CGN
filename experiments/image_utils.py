@@ -60,6 +60,8 @@ def show_multiple_images(
         title="Sample images",
         save=False,
         path=None,
+        subtitlesize=16,
+        titlesize=18,
     ):
     """Displays multiple images."""
 
@@ -85,9 +87,9 @@ def show_multiple_images(
         ax.set_xticks([])
         ax.set_yticks([])
         if i < len(subtitles):
-            ax.set_title(subtitles[i], fontsize=20)
+            ax.set_title(subtitles[i], fontsize=subtitlesize)
 
-    plt.suptitle(title, fontsize=25)
+    plt.suptitle(title, fontsize=titlesize)
 
     if save:
         assert path is not None
