@@ -109,7 +109,8 @@ class ImagenetVanilla(Dataset) :
 
         t_list += [transforms.ToTensor(), normalize]
         self.T_ims = transforms.Compose(t_list)
-
+        
+        self.classes = sorted(os.listdir(ims_path))
         self.im_paths, self.labels = self.get_data(ims_path)
 
     def set_len(self, n):
