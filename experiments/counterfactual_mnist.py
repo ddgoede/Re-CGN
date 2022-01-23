@@ -14,8 +14,9 @@ from torchvision.utils import make_grid
 from matplotlib import pyplot as plt
 import os
 
-from experiment_utils import set_env
-set_env()
+if __name__ == "__main__":
+    from experiment_utils import set_env
+    set_env()
 
 from cgn_framework.mnists.generate_data import generate_cf_dataset, generate_dataset, get_dataloaders
 from cgn_framework.mnists.train_cgn import CGN

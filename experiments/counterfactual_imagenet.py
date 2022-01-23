@@ -5,8 +5,11 @@ from matplotlib import pyplot as plt
 from datetime import datetime
 import os
 
-from experiment_utils import set_env, dotdict
-set_env()
+if __name__ == "__main__":
+    from experiment_utils import set_env, dotdict
+    set_env()
+else:
+    from experiments.experiment_utils import dotdict
 
 from cgn_framework.imagenet.generate_data import main as generate_main
 

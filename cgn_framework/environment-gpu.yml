@@ -19,3 +19,4 @@ dependencies:
     - tqdm==4.62.3
     - repackage==0.7.3
     - yacs==0.1.8
+    - notebook==6.4.7
