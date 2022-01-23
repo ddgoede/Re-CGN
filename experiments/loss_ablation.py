@@ -1,5 +1,6 @@
-from experiment_utils import set_env
-set_env()
+if __name__ == "__main__":
+    from experiment_utils import set_env
+    set_env()
 
 from cgn_framework.imagenet import train_cgn, config
 
