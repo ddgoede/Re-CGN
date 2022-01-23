@@ -34,6 +34,7 @@ __C.TRAIN.EPOCHS = 5
 __C.LAMBDAS = CN()
 __C.LAMBDAS.MASK = 0.5
 __C.LAMBDAS.PERC = [0, 0.05, 0.05, 0]
+__C.LAMBDAS.EDGE = 0.1
 
 # Learnign Rates
 __C.LR = CN()

@@ -48,7 +48,7 @@ def fit(cfg, cgn, discriminator, dataloader, opts, losses, device):
     save_cfg(cfg, model_path / "cfg.yaml")
 
     # Training Loop
-    L_perc, L_adv, L_binary = losses
+    L_perc, L_adv, L_binary, L_edge = losses
 
     pbar = tqdm(range(cfg.TRAIN.EPOCHS))
     for epoch in pbar:
@@ -79,6 +79,7 @@ def fit(cfg, cgn, discriminator, dataloader, opts, losses, device):
             losses_g['adv'] = L_adv(validity, valid)
             losses_g['binary'] = L_binary(mask)
             losses_g['perc'] = L_perc(x_gen, x_gt)
+            L_perc, L_adv, L_binary = losses
 
             # Backprop and step
             loss_g = sum(losses_g.values())
@@ -145,7 +146,18 @@ def main(cfg):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     cgn = cgn.to(device)
     discriminator = discriminator.to(device)
-    losses = (l.to(device) for l in losses)
+
+    def L_edge(mask):
+        batches, channels, width, height = mask.shape
+
+        inverse_edge_size = 5
+
+        center_of_mask = mask[:, :, width // inverse_edge_size : -width // inverse_edge_size, height // inverse_edge_size : -height // inverse_edge_size]
+        loss = torch.sum(mask) - torch.sum(center_of_mask) * 2
+
+        return loss / (width * height * batches) * cfg.LAMBDAS.EDGE
+
+    losses = [l.to(device) for l in losses] + [L_edge]
 
     fit(cfg, cgn, discriminator, dataloader, opts, losses, device)
 
