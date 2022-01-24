@@ -14,18 +14,7 @@ import seaborn as sns
 import torch
 from torchvision import transforms
 
-
-def denormalize(x: torch.Tensor, mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]):
-    """Denormalizes an image."""
-
-    mean = np.array(mean)
-    std = np.array(std)
-    denormalize_transform = transforms.Normalize(
-        mean=-(mean / std),
-        std=(1.0 / std),
-    )
-
-    return denormalize_transform(x)
+from imagenet_utils import denormalize
 
 
 def show_single_image(x: torch.Tensor, figsize=None, normalized=True, title="Sample image"):
