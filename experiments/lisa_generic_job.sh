@@ -18,5 +18,6 @@ source deactivate
 source activate gcn-gpu
 
 # Run your code
-echo "Running command: python imagenet_eval_contributions.py"
-python imagenet_eval_contributions.py
+# echo "Running command: python imagenet_eval_contributions.py"
+# python imagenet_eval_contributions.py
+python evaluate_imagenet_sketch.py
