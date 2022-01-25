@@ -38,7 +38,7 @@ def main():
     plt.imshow(image_grid.permute(1, 2, 0))
         # Save the resulting figures accordingly.
     file_name = "qualitative_imagenet"
-    directory = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "figures", "qualitative")
+    directory = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "media", "figures", "qualitative")
 
     if not os.path.exists(directory):
         os.makedirs(directory, exist_ok=True)
