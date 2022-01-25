@@ -18,7 +18,17 @@ def disable_loss_from_config(cfg):
         cfg.LAMBDA.L1 = 0
         cfg.LAMBDA.PERC = [0, 0, 0, 0]
 
-def main():
+def main(args):
+    cfg = config.get_cfg_defaults()
+    cfg = train_cgn.merge_args_and_cfg(args, cfg)
+    cfg.disable_loss = args.disable_loss
+
+    print(cfg)
+    disable_loss_from_config(cfg)
+
+    train_cgn.main(cfg)
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # Add arguments from original training script
     parser.add_argument('--model_name', default='tmp',
@@ -47,14 +57,4 @@ def main():
                         help='Choose 0 or more losses whose weight will become 0')
     args = parser.parse_args()
 
-    cfg = config.get_cfg_defaults()
-    cfg = train_cgn.merge_args_and_cfg(args, cfg)
-    cfg.disable_loss = args.disable_loss
-
-    print(cfg)
-    disable_loss_from_config(cfg)
-
-    train_cgn.main(cfg)
-
-if __name__ == "__main__":
-    main()
+    main(args)
