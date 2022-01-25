@@ -51,6 +51,8 @@ def show_multiple_images(
         path=None,
         subtitlesize=16,
         titlesize=18,
+        show=True,
+        return_figure=False,
     ):
     """Displays multiple images."""
 
@@ -84,4 +86,8 @@ def show_multiple_images(
         assert path is not None
         plt.savefig(path, bbox_inches="tight")
 
-    plt.show()
+    if show:
+        plt.show()
+    
+    if return_figure:
+        return fig
