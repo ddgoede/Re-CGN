@@ -2,6 +2,7 @@
 *.png
 *.pdf
 *experiments/results/*.pth
+experiments/weights/*.pth*
 
 # Slurm outputs
 cgn_framework/slurm/output_*.out

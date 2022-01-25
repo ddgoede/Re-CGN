@@ -5,8 +5,11 @@ Reference: https://github.com/eminorhan/ood-benchmarks/blob/master/utils.py
 
 import os
 import time
+from black import out
 import torch
 import torchvision
+
+from experiments.experiment_utils import REPO_PATH
 
 
 class ShortEdgeCenterCrop():
@@ -76,7 +79,7 @@ def accuracy(output, target, topk=(1,)):
         return res
 
 
-def validate(val_loader, model, gpu=None, print_freq=10):
+def simple_validate(val_loader, model, gpu=None, print_freq=10):
     batch_time = AverageMeter('Time', ':6.3f')
     top1 = AverageMeter('Acc@1', ':6.2f')
     progress = ProgressMeter(len(val_loader), [batch_time, top1], prefix='Test: ')
@@ -99,6 +102,96 @@ def validate(val_loader, model, gpu=None, print_freq=10):
             # measure accuracy and record loss
             acc1 = accuracy(output, target, topk=(1, ))
             top1.update(acc1[0].cpu().numpy()[0], images.size(0))
+
+            # measure elapsed time
+            batch_time.update(time.time() - end)
+            end = time.time()
+
+            if i % print_freq == 0:
+                progress.display(i)
+
+        print('* Acc@1 {top1.avg:.3f} '.format(top1=top1))
+
+    return top1.avg
+
+
+def imagenet_adv_validate(val_loader, model, gpu=None, print_freq=10, eval_indices=None):
+    batch_time = AverageMeter('Time', ':6.3f')
+    top1 = AverageMeter('Acc@1', ':6.2f')
+    progress = ProgressMeter(len(val_loader), [batch_time, top1], prefix='Test: ')
+
+    # switch to evaluate mode
+    model.eval()
+
+    with torch.no_grad():
+        end = time.time()
+        for i, (images, target) in enumerate(val_loader):
+            if gpu is not None:
+                # images = images.cuda(gpu, non_blocking=True)
+                # target = target.cuda(gpu, non_blocking=True)
+                images=images.to(gpu)
+                target=target.to(gpu)
+
+            # compute output
+            output = model(images)
+            output = output[:,eval_indices]
+
+            # measure accuracy and record loss
+            acc1 = accuracy(output, target, topk=(1, ))
+            top1.update(acc1[0].cpu().numpy()[0], images.size(0))
+
+            # measure elapsed time
+            batch_time.update(time.time() - end)
+            end = time.time()
+
+            if i % print_freq == 0:
+                progress.display(i)
+
+        print('* Acc@1 {top1.avg:.3f} '.format(top1=top1))
+
+    return top1.avg
+
+
+def stylized_imagenet_validate(val_loader, model, gpu=None, print_freq=10):
+    import sin_utils 
+    batch_time = AverageMeter('Time', ':6.3f')
+    top1 = AverageMeter('Acc@1', ':6.2f')
+    progress = ProgressMeter(len(val_loader), [batch_time, top1], prefix='Test: ')
+
+    # switch to evaluate mode
+    model.eval()
+
+    with torch.no_grad():
+        end = time.time()
+        for i, (images, target) in enumerate(val_loader):
+            if gpu is not None:
+                # images = images.cuda(gpu, non_blocking=True)
+                # target = target.cuda(gpu, non_blocking=True)
+                images=images.to(gpu)
+                target=target.to(gpu)
+
+            # compute output
+            output = model(images)
+            mapping = sin_utils.ImageNetProbabilitiesTo16ClassesMapping()
+
+            import helper.human_categories as hc
+            c = hc.HumanCategories()
+
+            output = output.softmax(1).cpu().numpy()
+            output = [mapping.probabilities_to_decision(x) for x in output]
+            output = [hc.get_human_object_recognition_categories().index(x) for x in output]
+            # output = torch.tensor(output)
+            import numpy as np
+            acc1 = np.mean(np.array(output) == target.cpu().numpy()) * 100
+
+            # print(output, target, c.get_imagenet_indices_for_category(output[0]))
+            # print()
+            # output = torch.stack(output)
+
+            # measure accuracy and record loss
+            # acc1 = accuracy(output, target, topk=(1, ))
+            # top1.update(acc1[0].cpu().numpy()[0], images.size(0))
+            top1.update(acc1, images.size(0))
 
             # measure elapsed time
             batch_time.update(time.time() - end)
