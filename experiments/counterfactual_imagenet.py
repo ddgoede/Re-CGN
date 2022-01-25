@@ -29,13 +29,22 @@ def main():
     images_dir = os.path.join(data_path, 'ims')
 
     # Get the locations of the generated images
-    image_paths = (images_dir + "/" + path for path, _ in zip(os.listdir(images_dir), range(examples_count)))
+    image_paths = [images_dir + "/" + path for path, _ in zip(os.listdir(images_dir), range(examples_count))]
 
     # Construct a grid with the generated images
     images = [torchvision.io.read_image(path) for path in image_paths]
     image_grid = make_grid(images, nrow=examples_count)
 
     plt.imshow(image_grid.permute(1, 2, 0))
+        # Save the resulting figures accordingly.
+    file_name = "qualitative_imagenet"
+    directory = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), "figures", "qualitative")
+
+    if not os.path.exists(directory):
+        os.makedirs(directory, exist_ok=True)
+
+    print(os.path.join(directory, file_name + ".pdf"))
+    plt.savefig(os.path.join(directory, file_name + ".pdf"))
     plt.show()
 
 if __name__ == "__main__":
