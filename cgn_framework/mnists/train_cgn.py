@@ -33,10 +33,10 @@ def sample_image(cgn, sample_path, batches_done, device, n_row=3, n_classes=10):
     save(foreground.data, f"{sample_path}/2_{batches_done:d}_foreground.png", n_row)
     save(background.data, f"{sample_path}/3_{batches_done:d}_background.png", n_row)
 
-def fit(cfg, cgn, discriminator, dataloader, opts, losses, device):
+def fit(cfg, cgn, discriminator, dataloader, opts, losses, device, use_time_in_filename=True):
 
     # directories for experiments
-    time_str = datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+    time_str = datetime.now().strftime("%Y_%m_%d_%H_%M_%S") if use_time_in_filename else ""
     model_path = Path('.') / 'mnists' / 'experiments'
     model_path /= f'cgn_{cfg.TRAIN.DATASET}_{time_str}_{cfg.MODEL_NAME}'
     weights_path = model_path / 'weights'
@@ -147,13 +147,14 @@ def main(cfg):
     discriminator = discriminator.to(device)
     losses = (l.to(device) for l in losses)
 
-    fit(cfg, cgn, discriminator, dataloader, opts, losses, device)
+    fit(cfg, cgn, discriminator, dataloader, opts, losses, device, use_time_in_filename=cfg.USE_TIME_IN_FILENAME)
 
 def merge_args_and_cfg(args, cfg):
     cfg.MODEL_NAME = args.model_name
     cfg.LOG.SAVE_ITER = args.save_iter
     cfg.TRAIN.EPOCHS = args.epochs
     cfg.TRAIN.BATCH_SIZE = args.batch_size
+    cfg.USE_TIME_IN_FILENAME = not args.ignore_time_in_filename
     return cfg
 
 if __name__ == "__main__":
@@ -168,6 +169,7 @@ if __name__ == "__main__":
                         help="number of epochs of training")
     parser.add_argument("--batch_size", type=int, default=16,
                         help="size of the batches")
+    parser.add_argument("--ignore_time_in_filename", action="store_true")
     args = parser.parse_args()
 
     # get cfg

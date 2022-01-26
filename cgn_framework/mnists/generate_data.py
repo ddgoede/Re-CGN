@@ -98,7 +98,7 @@ if __name__ == "__main__":
 
     else:
         # Generate counterfactual dataset
-        if "cgn_" in args.weight_path:
+        if f"cgn_{args.dataset}" in args.weight_path:
             # load model
             device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
             cgn = CGN()
@@ -110,7 +110,7 @@ if __name__ == "__main__":
             generate_cf_dataset(cgn=cgn, path=args.dataset + '_counterfactual.pth',
                                 dataset_size=args.dataset_size, no_cfs=args.no_cfs,
                                 device=device)
-        elif "gan_" in args.weight_path:
+        elif f"gan_{args.dataset}" in args.weight_path:
             device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
             generator = GenConv()
             generator.load_state_dict(torch.load(args.weight_path, 'cpu'))
