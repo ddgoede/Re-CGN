@@ -35,6 +35,9 @@ def train(args, model, device, train_loader, optimizer, epoch):
     print('\nTrain set: Average loss: {:.4f}, Accuracy: {}/{} ({:.1f}%)\n'.format(
         loss, correct, len(train_loader.dataset),
         100. * correct / len(train_loader.dataset)))
+    
+    train_acc = 100. * correct / len(train_loader.dataset)
+    return train_acc
 
 def test(model, device, test_loader):
     model.eval()
@@ -71,10 +74,12 @@ def main(args):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = model.to(device)
 
+    train_accs = dict()
     test_accs = dict()
     for epoch in range(1, args.epochs + 1):
-        train(args, model, device, dl_train, optimizer, epoch)
+        train_acc = train(args, model, device, dl_train, optimizer, epoch)
         test_acc = test(model, device, dl_test)
+        train_accs[epoch] = train_acc
         test_accs[epoch] = test_acc
         scheduler.step()
     
@@ -91,6 +96,7 @@ def main(args):
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
     print('Saving test accuracy to {}'.format(save_path))
     torch.save(test_accs, save_path)
+    torch.save(train_accs, save_path.replace("test_accs", "train_accs"))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

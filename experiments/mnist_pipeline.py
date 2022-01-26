@@ -34,7 +34,7 @@ class MNISTPipeline:
     Each Step saves the results to a directory and is not run if cached results exist.
     If generate=False, the pipeline will run for original dataset.
     """
-    def __init__(self, args, train_generative=False, generate=True) -> None:
+    def __init__(self, args, setting="Original", train_generative=False, generate=True) -> None:
         """
         Initialize the pipeline.
 
@@ -45,6 +45,7 @@ class MNISTPipeline:
         """
         self.train_generative = train_generative
         self.generate = generate
+        self.setting = setting
         self.args = self._check_args(args)
         print("::::: Experimental setup :::::")
         print("Train generative model:", self.train_generative)
@@ -69,7 +70,7 @@ class MNISTPipeline:
             # NOTE: this is config used only for training generative model
             self.gencfg = load_cfg(args.cfg) if args.cfg else get_cfg_defaults()
     
-        if self.generate and not self.train_generative:
+        if self.generate and not self.train_generative and self.setting != "Original":
             if not os.path.exists(args.weight_path):
                 raise FileNotFoundError(
                     "The weight path for given CGN/GAN model does not exist."
@@ -102,33 +103,58 @@ class MNISTPipeline:
 
         return weight_path
     
-    def generate_data(self, dataset, weight_path):
+    def generate_data(self, dataset, weight_path, dataset_suffix=""):
         """Generate data using trained/given GAN/CGN/None model."""
         if self.generate:
-            cmd = f"python {REPO_PATH}/cgn_framework/mnists/generate_data.py --dataset {dataset}"
-            if "gan" in weight_path or "cgn" in weight_path:
-                cmd += f" --weight_path {weight_path}"
-            print(cmd)
-            call(cmd, shell=True)
+
+            if self.setting == "Original":
+                train_file_path = os.path.join(
+                    REPO_PATH,
+                    f"cgn_framework/mnists/data/{dataset}_train.pth",
+                )
+                test_file_path = train_file_path.replace("_train", "_test")
+                if not os.path.exists(train_file_path) and os.path.exists(test_file_path):
+                    cmd = f"python {REPO_PATH}/cgn_framework/mnists/generate_data.py --dataset {dataset}"
+                    print(cmd)
+                    call(cmd, shell=True)
+                else:
+                    print(f"Train Dataset already generated at {train_file_path}.")
+                    print(f"Test Dataset already generated at {test_file_path}.")
+            else:
+                tensor_file_path = os.path.join(
+                    REPO_PATH,
+                    f"cgn_framework/mnists/data/{dataset}{dataset_suffix}.pth",
+                )
+                if not os.path.exists(tensor_file_path):
+                    cmd = f"python {REPO_PATH}/cgn_framework/mnists/generate_data.py"\
+                        f" --dataset {dataset}  --weight_path {weight_path}"
+                    print(cmd)
+                    call(cmd, shell=True)
+                else:
+                    print(f"Dataset already generated at {tensor_file_path}.")
     
     def train_classifier(self, seed, dataset, dataset_suffix="", combined=False):
         """Train a classifier on the generated data."""
+        dataset += dataset_suffix
 
         # extract classifier results
         expt_suffix = (dataset) if not combined else (dataset + "_combined")
         expt_suffix += "_seed_" + str(seed) if seed is not None else ""
-        results_path = f'mnists/experiments/classifier_{expt_suffix}/test_accs.pth'
 
-        if not os.path.exists(results_path):
+        train_results_path = f'mnists/experiments/classifier_{expt_suffix}/train_accs.pth'
+        test_results_path = f'mnists/experiments/classifier_{expt_suffix}/test_accs.pth'
+
+        if not (os.path.exists(test_results_path) and os.path.exists(train_results_path)):
             cmd = f"python {REPO_PATH}/cgn_framework/mnists/train_classifier.py"\
-                f" --dataset {dataset}{dataset_suffix} --seed {seed}"
+                f" --dataset {dataset} --seed {seed}"
             print(cmd)
             call(cmd, shell=True)
         else:
-            print(f"Results for classifier already exist: {results_path}")
+            print(f"Results for classifier already exist: {test_results_path}")
 
-        results = torch.load(results_path)
-        return results
+        train_results = torch.load(train_results_path)
+        test_results = torch.load(test_results_path)
+        return {"train": train_results, "test": test_results}
 
     def run(self):
         """Main experiment runner."""
@@ -138,17 +164,86 @@ class MNISTPipeline:
         weight_path = self.train_generative_model()
 
         # generate data
-        self.generate_data(self.args.dataset, weight_path)
+        dataset_suffix = ""
+        if self.setting != "Original":
+            dataset_suffix = "_counterfactual" if f"cgn_{self.args.dataset}" in weight_path else "_gan"
+        self.generate_data(self.args.dataset, weight_path, dataset_suffix=dataset_suffix)
 
         # train classifier
-        dataset_suffix = ""
-        if self.generate:
-            dataset_suffix = "_counterfactual" if f"cgn_{self.args.dataset}" in weight_path else "_gan"
-
         results = self.train_classifier(
             self.args.seed, self.args.dataset, dataset_suffix, self.args.combined,
         )
         return results
+
+
+def run_experiments(seed=0, datasets=["colored_MNIST", "double_colored_MNIST", "wildlife_MNIST"]):
+    """Run experiments on MNISTs"""
+
+    columns = []
+    for d in datasets:
+        columns.extend([d + '-train', d + "-test"])
+    rows = ["Original", "Original + GAN", "Original + CGN"]
+    df = pd.DataFrame(None, columns=columns)
+
+    for dataset in datasets:
+
+        # training on original dataset
+        pipeline = MNISTPipeline(
+            args=dotdict(dict(seed=seed, dataset=dataset)),
+            train_generative=False,
+            generate=True,
+            setting=rows[0],
+        )
+        result = pipeline.run()
+        # here: 10 denotes the last epoch
+        df.at[rows[0], dataset + "-train"] = result["train"][10]
+        df.at[rows[0], dataset + "-test"] = result["test"][10]
+
+        # generate GAN dataset -> training on GAN dataset (not combined)
+        pipeline = MNISTPipeline(
+            args=dotdict(
+                dict(
+                    seed=seed,
+                    dataset=dataset,
+                    weight_path=os.path.join(
+                        REPO_PATH,
+                        f"cgn_framework/mnists/experiments/gan_{dataset}/weights/ckp.pth",
+                    ),
+                )
+            ),
+            train_generative=False,
+            generate=True,
+            setting=rows[1],
+        )
+        result = pipeline.run()
+        df.at[rows[1], dataset + "-train"] = result["train"][10]
+        df.at[rows[1], dataset + "-test"] = result["test"][10]
+
+        # generate GAN dataset -> training on GAN dataset (not combined)
+        pipeline = MNISTPipeline(
+            args=dotdict(
+                dict(
+                    seed=seed,
+                    dataset=dataset,
+                    weight_path=os.path.join(
+                        REPO_PATH,
+                        f"cgn_framework/mnists/experiments/cgn_{dataset}/weights/ckp.pth",
+                    ),
+                )
+            ),
+            train_generative=False,
+            generate=True,
+            setting=rows[2],
+        )
+        result = pipeline.run()
+        df.at[rows[2], dataset + "-train"] = result["train"][10]
+        df.at[rows[2], dataset + "-test"] = result["test"][10]
+    
+    print("")
+    print("::::::::::::::::::: Final result :::::::::::::::::::")
+    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+        print(df)
+    print("::::::::::::::::::::::::::::::::::::::::::::::::::::")
 
 
 if __name__ == "__main__":
@@ -196,14 +291,15 @@ if __name__ == "__main__":
     # pipeline.run()
 
     # train CGN -> generate CGN data -> train classifier on CGN data
-    args = dict(
-        seed=0,
-        dataset="colored_MNIST",
-        # weight_path="/home/lcur0478/piyush/projects/fact-team3/cgn_framework/mnists/experiments/cgn_colored_MNIST/weights/ckp.pth",
-        cfg="/home/lcur0478/piyush/projects/fact-team3/cgn_framework/mnists/experiments/cgn_colored_MNIST/cfg.yaml",
-    )
-    pipeline = MNISTPipeline(
-        args=dotdict(args), train_generative=True, generate=True,
-    )
-    pipeline.run()
+    # args = dict(
+    #     seed=0,
+    #     dataset="colored_MNIST",
+    #     # weight_path="/home/lcur0478/piyush/projects/fact-team3/cgn_framework/mnists/experiments/cgn_colored_MNIST/weights/ckp.pth",
+    #     cfg="/home/lcur0478/piyush/projects/fact-team3/cgn_framework/mnists/experiments/cgn_colored_MNIST/cfg.yaml",
+    # )
+    # pipeline = MNISTPipeline(
+    #     args=dotdict(args), train_generative=True, generate=True,
+    # )
+    # pipeline.run()
 
+    run_experiments(seed=0)
