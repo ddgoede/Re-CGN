@@ -203,11 +203,11 @@ class CGNGradio:
         return fig
 
     
-    def launch(self):
+    def launch(self, **kwargs):
         inputs = self.configure_input()
         outputs = self.configure_output()
         self.iface = gr.Interface(fn=self.display_result, inputs=inputs, outputs=outputs)
-        self.iface.launch()
+        self.iface.launch(**kwargs)
 
 
 if __name__ == "__main__":
@@ -251,4 +251,4 @@ if __name__ == "__main__":
     ensemble_gradcam = EnsembleGradCAM(ensemble_model=model, gradcam_method="GradCAM")
 
     cgn_gradio = CGNGradio(model, cgn, ds_val, df, ensemble_gradcam)
-    cgn_gradio.launch()
+    cgn_gradio.launch(share=True)
