@@ -146,7 +146,8 @@ class MNISTPipeline:
 
         if not (os.path.exists(test_results_path) and os.path.exists(train_results_path)):
             cmd = f"python {REPO_PATH}/cgn_framework/mnists/train_classifier.py"\
-                f" --dataset {dataset} --seed {seed}"
+                f" --dataset {dataset} --seed {seed}" + \
+                (f" --combined" if combined else "")
             print(cmd)
             call(cmd, shell=True)
         else:
@@ -182,7 +183,13 @@ def run_experiments(seed=0, datasets=["colored_MNIST", "double_colored_MNIST", "
     columns = []
     for d in datasets:
         columns.extend([d + '-train', d + "-test"])
-    rows = ["Original", "Original + GAN", "Original + CGN"]
+    rows = [
+        "Original",
+        "Original + GAN",
+        "Original + CGN",
+        "Original + GAN (combined)",
+        "Original + CGN (combined)",
+    ]
     df = pd.DataFrame(None, columns=columns)
 
     for dataset in datasets:
@@ -219,7 +226,7 @@ def run_experiments(seed=0, datasets=["colored_MNIST", "double_colored_MNIST", "
         df.at[rows[1], dataset + "-train"] = result["train"][10]
         df.at[rows[1], dataset + "-test"] = result["test"][10]
 
-        # generate GAN dataset -> training on GAN dataset (not combined)
+        # generate CGN dataset -> training on CGN dataset (not combined)
         pipeline = MNISTPipeline(
             args=dotdict(
                 dict(
@@ -238,7 +245,49 @@ def run_experiments(seed=0, datasets=["colored_MNIST", "double_colored_MNIST", "
         result = pipeline.run()
         df.at[rows[2], dataset + "-train"] = result["train"][10]
         df.at[rows[2], dataset + "-test"] = result["test"][10]
-    
+
+        # generate GAN dataset -> training on GAN dataset (combined)
+        pipeline = MNISTPipeline(
+            args=dotdict(
+                dict(
+                    seed=seed,
+                    dataset=dataset,
+                    weight_path=os.path.join(
+                        REPO_PATH,
+                        f"cgn_framework/mnists/experiments/gan_{dataset}/weights/ckp.pth",
+                    ),
+                    combined=True,
+                )
+            ),
+            train_generative=False,
+            generate=True,
+            setting=rows[2],
+        )
+        result = pipeline.run()
+        df.at[rows[3], dataset + "-train"] = result["train"][10]
+        df.at[rows[3], dataset + "-test"] = result["test"][10]
+
+        # generate CGN dataset -> training on CGN dataset (combined)
+        pipeline = MNISTPipeline(
+            args=dotdict(
+                dict(
+                    seed=seed,
+                    dataset=dataset,
+                    weight_path=os.path.join(
+                        REPO_PATH,
+                        f"cgn_framework/mnists/experiments/cgn_{dataset}/weights/ckp.pth",
+                    ),
+                    combined=True,
+                )
+            ),
+            train_generative=False,
+            generate=True,
+            setting=rows[2],
+        )
+        result = pipeline.run()
+        df.at[rows[4], dataset + "-train"] = result["train"][10]
+        df.at[rows[4], dataset + "-test"] = result["test"][10]
+
     print("")
     print("::::::::::::::::::: Final result :::::::::::::::::::")
     with pd.option_context('display.max_rows', None, 'display.max_columns', None):
@@ -247,59 +296,4 @@ def run_experiments(seed=0, datasets=["colored_MNIST", "double_colored_MNIST", "
 
 
 if __name__ == "__main__":
-    # # training classifier on original dataset
-    # args = dict(
-    #     seed=0,
-    #     dataset="colored_MNIST",
-    # )
-    # pipeline = MNISTPipeline(
-    #     args=dotdict(args), train_generative=False, generate=False,
-    # )
-    # pipeline.run()
-
-    # # train classifier on already generated GAN/CGN data
-    # args = dict(
-    #     seed=0,
-    #     # dataset="colored_MNIST_gan",
-    #     dataset="colored_MNIST_counterfactual",
-    # )
-    # pipeline = MNISTPipeline(
-    #     args=dotdict(args), train_generative=False, generate=False,
-    # )
-    # pipeline.run()
-
-    # # generate GAN data -> train classifier on GAN data
-    # args = dict(
-    #     seed=0,
-    #     dataset="colored_MNIST",
-    #     weight_path="/home/lcur0478/piyush/projects/fact-team3/cgn_framework/mnists/experiments/gan_colored_MNIST/weights/ckp.pth",
-    # )
-    # pipeline = MNISTPipeline(
-    #     args=dotdict(args), train_generative=False, generate=True,
-    # )
-    # pipeline.run()
-
-    # # generate CGN data -> train classifier on CGN data
-    # args = dict(
-    #     seed=0,
-    #     dataset="colored_MNIST",
-    #     weight_path="/home/lcur0478/piyush/projects/fact-team3/cgn_framework/mnists/experiments/cgn_colored_MNIST/weights/ckp.pth",
-    # )
-    # pipeline = MNISTPipeline(
-    #     args=dotdict(args), train_generative=False, generate=True,
-    # )
-    # pipeline.run()
-
-    # train CGN -> generate CGN data -> train classifier on CGN data
-    # args = dict(
-    #     seed=0,
-    #     dataset="colored_MNIST",
-    #     # weight_path="/home/lcur0478/piyush/projects/fact-team3/cgn_framework/mnists/experiments/cgn_colored_MNIST/weights/ckp.pth",
-    #     cfg="/home/lcur0478/piyush/projects/fact-team3/cgn_framework/mnists/experiments/cgn_colored_MNIST/cfg.yaml",
-    # )
-    # pipeline = MNISTPipeline(
-    #     args=dotdict(args), train_generative=True, generate=True,
-    # )
-    # pipeline.run()
-
     run_experiments(seed=0)
