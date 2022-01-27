@@ -94,12 +94,14 @@ def plot_features(
 
     ax[0].grid()
     ax[0].set_title("Original", fontsize=20)
-    sns.scatterplot(data=df_original, x="Z1", y="Z2", hue="y", palette="deep", ax=ax[0])
+
+    colors = ["red", "cyan", "yellow", "skyblue", "orange", "purple", "cyan", "pink", "limegreen", "salmon"]
+    sns.scatterplot(data=df_original, x="Z1", y="Z2", hue="y", ax=ax[0], palette="deep")
     ax[0].legend(fontsize=16)
 
     ax[1].grid()
     ax[1].set_title("Counterfactual", fontsize=20)
-    sns.scatterplot(data=df_counterfactual, x="Z1", y="Z2", hue="y", palette="deep", ax=ax[1])
+    sns.scatterplot(data=df_counterfactual, x="Z1", y="Z2", hue="y", ax=ax[1], palette="deep")
     ax[1].legend(fontsize=16)
 
     plt.suptitle(f"Features for  {model_desc} ({dataset.replace('_', ' ')})", fontsize=25)
@@ -138,32 +140,52 @@ class MNISTAnalysis:
         assert isinstance(seed, int)
     
     def visualize_feature(self, num_batches_to_use=20, show=False, save=True):
-        # load dataloaders
-        print("Loading datasets...")
-        dl_og_train, dl_og_test = get_tensor_dataloaders(dataset=f"{self.dataset}")
-        dl_cf_train, dl_cf_test = get_tensor_dataloaders(dataset=f"{self.dataset}_counterfactual")
 
-        # load model
-        print("Loading model...")
-        model = CNN()
-        model.load_state_dict(torch.load(self.weight_path, map_location="cpu"))
-        model.cls = torch.nn.Identity()
-        model = model.eval().to(self.device)
+        save_dir = os.path.dirname(self.weight_path).replace("weights", "features")
+        os.makedirs(save_dir, exist_ok=True)
+        save_path_og = join(save_dir, f"{self.dataset}_original.pth")
+        save_path_cf = join(save_dir, f"{self.dataset}_counterfactual.pth")
 
-        # get features
-        features_og, y_og = get_model_features(
-            model, dl_og_test, self.device, num_batches_to_use=num_batches_to_use,
-        )
-        print("Original features extracted of shape {}".format(features_og.shape))
-        features_cf, y_cf = get_model_features(
-            model, dl_cf_test, self.device, num_batches_to_use=num_batches_to_use,
-        )
-        print("Counterfactual features extracted of shape {}".format(features_cf.shape))
+        if not os.path.exists(save_path_og) or not os.path.exists(save_path_cf):
 
-        # reduce dimensionality
-        print("Reducing dimensionality...")
-        Z_og = reduce_dimensionality(features_og)
-        Z_cf = reduce_dimensionality(features_cf)
+            # load dataloaders
+            print("Loading datasets...")
+            dl_og_train, dl_og_test = get_tensor_dataloaders(dataset=f"{self.dataset}")
+            dl_cf_train, dl_cf_test = get_tensor_dataloaders(dataset=f"{self.dataset}_counterfactual")
+
+            # load model
+            print("Loading model...")
+            model = CNN()
+            model.load_state_dict(torch.load(self.weight_path, map_location="cpu"))
+            model.cls = torch.nn.Identity()
+            model = model.eval().to(self.device)
+
+            # get features
+            features_og, y_og = get_model_features(
+                model, dl_og_test, self.device, num_batches_to_use=num_batches_to_use,
+            )
+            print("Original features extracted of shape {}".format(features_og.shape))
+            features_cf, y_cf = get_model_features(
+                model, dl_cf_test, self.device, num_batches_to_use=num_batches_to_use,
+            )
+            print("Counterfactual features extracted of shape {}".format(features_cf.shape))
+
+            # reduce dimensionality
+            print("Reducing dimensionality...")
+            Z_og = reduce_dimensionality(features_og)
+            Z_cf = reduce_dimensionality(features_cf)
+
+            print("Saving features at ...")
+            print("Original: {}".format(save_path_og))
+            print("Counterfactual: {}".format(save_path_cf))
+            torch.save({"feat": features_og, "y": y_og, "tsne": Z_og}, save_path_og)
+            torch.save({"feat": features_cf, "y": y_cf, "tsne": Z_cf}, save_path_cf)
+        else:
+            print(f"Loading saved features from {save_path_og} and {save_path_cf}")
+            Z_og = torch.load(save_path_og, map_location="cpu")["tsne"]
+            Z_cf = torch.load(save_path_cf, map_location="cpu")["tsne"]
+            y_og = torch.load(save_path_og, map_location="cpu")["y"]
+            y_cf = torch.load(save_path_cf, map_location="cpu")["y"]
 
         # create dataframe
         df_og = create_df(Z_og, y_og)
