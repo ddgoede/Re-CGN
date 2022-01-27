@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#SBATCH --partition=gpu_shared_course
+#SBATCH --gres=gpu:1
+#SBATCH --job-name=TrainMNISTFromScratch
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --time=10:00:00
+#SBATCH --mem=32000M
+#SBATCH --output=slurm/output_%A.out
+
+module purge
+module load 2021
+module load Anaconda3/2021.05
+
+# Activate your environment
+source deactivate
+source activate gcn-gpu
+# Run your code
+cd cgn_framework/
+python mnists/train_cgn.py --cfg mnists/experiments/cgn_colored_MNIST/cfg.yaml --model_name "colored_MNIST_scratch_60epochs" --epochs 60
+# python mnists/train_cgn.py --cfg mnists/experiments/cgn_double_colored_MNIST/cfg.yaml --model_name "double_colored_MNIST_scratch"
+# python mnists/train_cgn.py --cfg mnists/experiments/cgn_wildlife_MNIST/cfg.yaml --model_name "wildlife_MNIST_scratch"
