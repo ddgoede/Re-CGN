@@ -81,6 +81,8 @@ def fit(cfg, cgn, discriminator, dataloader, opts, losses, device):
             losses_g['perc'] = L_perc(x_gen, x_gt)
             losses_g['edge'] = L_edge(mask)
 
+            print(f"L_edge (training): {L_edge(torch.clamp(x_gt, 0.0, 1.0).repeat(1, 3, 1, 1))}, L_edge (sample): {losses_g['edge']}")
+
             # Backprop and step
             loss_g = sum(losses_g.values())
             loss_g.backward()
@@ -150,10 +152,9 @@ def main(cfg):
     def L_edge(mask):
         batches, channels, width, height = mask.shape
 
-        inverse_edge_size = 5
-
-        center_of_mask = mask[:, :, width // inverse_edge_size : -width // inverse_edge_size, height // inverse_edge_size : -height // inverse_edge_size]
-        loss = torch.sum(mask) - torch.sum(center_of_mask) * 2 # Multiply by two because the mask is the center + the edge. So mask - center = edge and mask - 2 * center = edge - center.
+        edge_pixels = 3
+        center_of_mask = mask[:, :, edge_pixels:(width-edge_pixels), edge_pixels:(height-edge_pixels)]
+        loss = torch.sum(mask) - torch.sum(center_of_mask)
 
         return loss / (width * height * batches) * cfg.LAMBDAS.EDGE
 
