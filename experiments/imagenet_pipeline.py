@@ -154,4 +154,45 @@ def run_experiments(seed=0, disp_epoch=45):
 
 
 if __name__ == "__main__":
-    run_experiments(seed=0, disp_epoch=6)
+    metrics_clf, df_ood = run_experiments(seed=0, disp_epoch=34)
+
+    # construct Table 3 of the paper
+    heads = ["shape", "texture", "bg"]
+    table_3 = pd.DataFrame(
+        None,
+        columns=["Shape bias", "Top 1", "Top 5"],
+        index=[f"IN-mini + CGN/{h}" for h in heads],
+    )
+    for i, h in enumerate(heads):
+        table_3.at[f"IN-mini + CGN/{h}", "Shape bias"] = metrics_clf[f"shape_biases/{i}_m_{h}_bias"]
+        table_3.at[f"IN-mini + CGN/{h}", "Top 1"] = metrics_clf[f"acc1/1_real"]
+        table_3.at[f"IN-mini + CGN/{h}", "Top 5"] = metrics_clf[f"acc5/1_real"]
+
+    table_3["Shape bias"] *= 100.0
+    table_3 = table_3.astype(float).round(1)
+    print(table_3)
+
+    # construct Table 4 of the paper
+    table_4 = pd.DataFrame(
+        None,
+        columns=["IN-9", "Mixed-same", "Mixed-rand", "BG-gap"],
+        index=["IN-mini + CGN"],
+    )
+
+    col_to_key = {
+        "IN-9": "in_9_acc1_original/avg",
+        "Mixed-same": "in_9_acc1_mixed_same/avg",
+        "Mixed-rand": "in_9_acc1_mixed_rand/avg",
+        "BG-gap": "in_9_gaps/bg_gap",
+    }
+
+    for c in table_4.columns:
+        assert col_to_key[c] in metrics_clf
+        key = col_to_key[c]
+        table_4.at["IN-mini + CGN", c] = metrics_clf[key]
+
+    table_4 = table_4.astype(float).round(1)
+    print(table_4)
+
+    print("\n::::: Results OOD :::::\n")
+    print(df_ood)
