@@ -177,7 +177,7 @@ class MNISTPipeline:
         return results
 
 
-def run_experiments(seed=0, datasets=["colored_MNIST", "double_colored_MNIST", "wildlife_MNIST"]):
+def run_experiments(seed=0, datasets=["colored_MNIST", "double_colored_MNIST", "wildlife_MNIST"], show=False):
     """Run experiments on MNISTs"""
 
     columns = []
@@ -289,10 +289,13 @@ def run_experiments(seed=0, datasets=["colored_MNIST", "double_colored_MNIST", "
         df.at[rows[4], dataset + "-test"] = result["test"][10]
 
     print("")
-    print("::::::::::::::::::: Final result :::::::::::::::::::")
-    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
-        print(df)
-    print("::::::::::::::::::::::::::::::::::::::::::::::::::::")
+    if show:
+        print("::::::::::::::::::: Final result :::::::::::::::::::")
+        with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+            print(df)
+        print("::::::::::::::::::::::::::::::::::::::::::::::::::::")
+    else:
+        return df
 
 
 if __name__ == "__main__":
