@@ -96,7 +96,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
     # save path
     if not args.resume:
-        time_str = datetime.now().strftime("%Y_%m_%d_%H_%M")
+        time_str = datetime.now().strftime("%Y_%m_%d_%H_%M") if not args.ignore_time_in_filename else ""
         model_path = join('.', 'imagenet', 'experiments',
                             f'classifier_{time_str}_{args.name}')
         pathlib.Path(model_path).mkdir(parents=True, exist_ok=True)
@@ -178,6 +178,11 @@ def main_worker(gpu, ngpus_per_node, args):
     if not args.resume:
         metrics = validate(model, val_loader, cf_val_loader,
                                dl_shape_bias, dls_in9, args)
+        save_metrics = {k: v.item() for k, v in metrics.items()}
+        save_dir = join(model_path, 'epochwise_metrics')
+        pathlib.Path(save_dir).mkdir(parents=True, exist_ok=True)
+        torch.save(save_metrics, join(save_dir, f'epoch_{args.start_epoch}.pt'))
+
         if args.evaluate: return
         if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                     and args.rank % ngpus_per_node == 0):
@@ -204,6 +209,10 @@ def main_worker(gpu, ngpus_per_node, args):
         # evaluate on validation set
         metrics = validate(model, val_loader, cf_val_loader,
                                dl_shape_bias, dls_in9, args)
+        save_metrics = {k: v.item() for k, v in metrics.items()}
+        save_dir = join(model_path, 'epochwise_metrics')
+        pathlib.Path(save_dir).mkdir(parents=True, exist_ok=True)
+        torch.save(save_metrics, join(save_dir, f'epoch_{epoch}.pt'))
 
         # remember best acc@1 and save checkpoint
         # acc1_overall = metrics['acc1/0_overall']
@@ -611,6 +620,7 @@ if __name__ == '__main__':
                         help='name of the experiment')
     parser.add_argument('--cf_ratio', default=1.0, type=float,
                         help='Ratio of CF/Real data')
+    parser.add_argument("--ignore_time_in_filename", action="store_true")
 
     args = parser.parse_args()
     print(args)

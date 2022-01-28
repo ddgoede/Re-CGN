@@ -35,4 +35,6 @@ source activate gcn-gpu
 # python imagenet_eval_ood_benchmark.py  --classifier cgn-ensemble --ood_dataset in-a --num_workers 2 --weight_path cgn_framework/imagenet/weights/classifier_on_in-mini_model_best.pth
 
 # python mnist_pipeline.py
-python mnist_analysis.py
+# python mnist_analysis.py
+
+python imagenet_pipeline.py
