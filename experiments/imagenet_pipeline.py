@@ -7,6 +7,7 @@ import os
 from os.path import join, exists, isdir
 from subprocess import call
 from glob import glob
+import pandas as pd
 import torch
 
 import warnings
@@ -14,6 +15,8 @@ warnings.filterwarnings("ignore")
 
 from experiment_utils import set_env, REPO_PATH, seed_everything, dotdict
 set_env()
+
+from imagenet_eval_ood_benchmark import eval_ood
 
 
 def generate_counterfactual_dataset(
@@ -85,7 +88,48 @@ def train_classifier(args: dict = dict(lr=0.001), prefix="in-mini", seed=0, disp
     return metrics
 
 
-def run_classification_experiments(seed=0, disp_epoch=45):
+def run_eval_on_ood_benchmarks(seed=0, ignore_cache=False, show=False):
+    classifiers=["cgn-ensemble", "resnet50"]
+    datasets=["in-mini", "in-a", "in-stylized", "in-sketch"]
+
+    df = pd.DataFrame(columns=datasets, index=classifiers)
+
+    for classifier in classifiers:
+        for dataset in datasets:
+            print(f"::::: Running {classifier} on {dataset}...")
+
+            weight_path = None
+            if dataset == "in-a" and classifier == "resnet50":
+                # modify temporarily
+                classifier = "resnet50-from-scratch"
+                # this should be downloaded from a script in setup
+                weight_path = "experiments/weights/resnet50_from_scratch_model_best.pth.tar"
+            
+            if classifier == "cgn-ensemble":
+                weight_path = "cgn_framework/imagenet/experiments/classifier__in-mini-classifier/model_best.pth"
+
+            args = dict(
+                seed=seed,
+                classifier=classifier,
+                ood_dataset=dataset,
+                num_workers=2,
+                batch_size=128,
+                ignore_cache=ignore_cache,
+            )
+            if weight_path is not None:
+                args["weight_path"] = weight_path
+            args = dotdict(args)
+            result = eval_ood(args, show=show)
+
+            if dataset == "in-a" and classifier == "resnet50-from-scratch":
+                classifier = "resnet50"
+
+            df.at[classifier, dataset] = result["acc1"]
+
+    return df
+
+
+def run_experiments(seed=0, disp_epoch=45):
     """Runs experiments on IN-mini dataset
 
     1. Generates CF dataset
@@ -94,15 +138,20 @@ def run_classification_experiments(seed=0, disp_epoch=45):
     seed_everything(seed)
 
     # step 1: generate dataset
-    print("::::: Generating CF dataset :::::")
+    print("\n::::: Generating CF dataset :::::\n")
     generate_counterfactual_dataset(prefix="in-mini", seed=seed)
 
     # step 2: train classifier
-    print("::::: Training classifier :::::")
+    print("\n::::: Training classifier :::::\n")
     metrics = train_classifier(prefix="in-mini", seed=seed, disp_epoch=disp_epoch)
 
-    return metrics
+    # step 3: evaluate on OOD benchmarks
+    print("\n::::: Evaluating OOD :::::\n")
+    df_ood = run_eval_on_ood_benchmarks(seed=seed, show=False)
+
+    return metrics, df_ood
+
 
 
 if __name__ == "__main__":
-    run_classification_experiments(seed=0, disp_epoch=45)
+    run_experiments(seed=0, disp_epoch=6)

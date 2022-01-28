@@ -106,7 +106,7 @@ def main(args):
     eval_args = dict(
         model=model,
         val_loader=eval_loader,
-        gpu=device,
+        gpu=device if str(device) != "cpu" else None,
         print_freq=10,
     )
     if args.ood_dataset in ["in-mini", "in-sketch"]:
@@ -127,6 +127,48 @@ def main(args):
     print("::: Elapsed time: {:.2f}s".format(end - start))
 
     return acc1
+
+
+def eval_ood(args, show=False):
+    if args.weight_path is not None:
+        args.weight_path = join(REPO_PATH, args.weight_path)
+        assert exists(args.weight_path), \
+            "Weight path {} does not exist".format(args.weight_path)
+
+    run_name = f"{args.classifier}_{args.ood_dataset}"
+    result_dir = join(REPO_PATH, "cgn_framework/imagenet/experiments/ood_eval", run_name)
+    os.makedirs(result_dir, exist_ok=True)
+    result_path = join(result_dir, f"results_seed_{args.seed}.json")
+
+    if exists(result_path):
+        if not args.ignore_cache:
+            print("::: Result file {} already exists & --ignore_cache={}".format(
+                result_path, args.ignore_cache
+            ))
+            with open(result_path, "r") as f:
+                result = json.load(f)
+            
+            if show:
+                print("::: Result: {}".format(json.dumps(result, indent=4)))
+            
+            return result
+        else:
+            print("::: Result file {} already exists, but --ignore_cache={}".format(
+                result_path, args.ignore_cache
+            ))
+            print("::: Re-running evaluation")
+
+    acc1 = main(args)
+
+    print("::: Saving results to {}.".format(result_path))
+    result = dict(
+        **vars(args),
+        acc1=acc1,
+    )
+    with open(result_path, "w") as f:
+        json.dump(result, f, indent=4)
+
+    return result
 
 
 if __name__ == "__main__":
