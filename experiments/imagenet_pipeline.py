@@ -129,7 +129,7 @@ def run_eval_on_ood_benchmarks(seed=0, ignore_cache=False, show=False):
     return df
 
 
-def run_experiments(seed=0, disp_epoch=45):
+def run_experiments(seed=0, generate_cf_data=False, disp_epoch=45):
     """Runs experiments on IN-mini dataset
 
     1. Generates CF dataset
@@ -138,8 +138,14 @@ def run_experiments(seed=0, disp_epoch=45):
     seed_everything(seed)
 
     # step 1: generate dataset
-    print("\n::::: Generating CF dataset :::::\n")
-    generate_counterfactual_dataset(prefix="in-mini", seed=seed)
+    if generate_cf_data:
+        print("WARNING: You have passed generate_cf_data=True.")
+        print("WARNING: This will take about 3 hours for train set and 20 mins for validation set.")
+        print("\n::::: Generating CF dataset :::::\n")
+        generate_counterfactual_dataset(prefix="in-mini", seed=seed)
+    else:
+        print("Since generate_cf_data=False, skipping CF dataset generation.")
+        print("Loading results for classification and OOD experiments from cache.")
 
     # step 2: train classifier
     print("\n::::: Training classifier :::::\n")
@@ -154,7 +160,7 @@ def run_experiments(seed=0, disp_epoch=45):
 
 
 if __name__ == "__main__":
-    metrics_clf, df_ood = run_experiments(seed=0, disp_epoch=34)
+    metrics_clf, df_ood = run_experiments(seed=0, generate_cf_data=False, disp_epoch=34)
 
     # construct Table 3 of the paper
     heads = ["shape", "texture", "bg"]
@@ -170,7 +176,9 @@ if __name__ == "__main__":
 
     table_3["Shape bias"] *= 100.0
     table_3 = table_3.astype(float).round(1)
+    print("\n::::: Table 3 :::::")
     print(table_3)
+    print()
 
     # construct Table 4 of the paper
     table_4 = pd.DataFrame(
@@ -192,7 +200,10 @@ if __name__ == "__main__":
         table_4.at["IN-mini + CGN", c] = metrics_clf[key]
 
     table_4 = table_4.astype(float).round(1)
+    print("\n::::: Table 4 :::::")
     print(table_4)
+    print()
 
-    print("\n::::: Results OOD :::::\n")
+    print("\n::::: Table 5 :::::")
     print(df_ood)
+    print()
