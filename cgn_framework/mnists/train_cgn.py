@@ -79,7 +79,7 @@ def fit(cfg, cgn, discriminator, dataloader, opts, losses, device):
             losses_g['adv'] = L_adv(validity, valid)
             losses_g['binary'] = L_binary(mask)
             losses_g['perc'] = L_perc(x_gen, x_gt)
-            L_perc, L_adv, L_binary = losses
+            losses_g['edge'] = L_edge(mask)
 
             # Backprop and step
             loss_g = sum(losses_g.values())
@@ -153,7 +153,7 @@ def main(cfg):
         inverse_edge_size = 5
 
         center_of_mask = mask[:, :, width // inverse_edge_size : -width // inverse_edge_size, height // inverse_edge_size : -height // inverse_edge_size]
-        loss = torch.sum(mask) - torch.sum(center_of_mask) * 2
+        loss = torch.sum(mask) - torch.sum(center_of_mask) * 2 # Multiply by two because the mask is the center + the edge. So mask - center = edge and mask - 2 * center = edge - center.
 
         return loss / (width * height * batches) * cfg.LAMBDAS.EDGE
 
