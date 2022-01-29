@@ -103,7 +103,7 @@ def run_eval_on_ood_benchmarks(seed=0, ignore_cache=False, show=False):
                 # modify temporarily
                 classifier = "resnet50-from-scratch"
                 # this should be downloaded from a script in setup
-                weight_path = "experiments/weights/resnet50_from_scratch_model_best.pth.tar"
+                weight_path = "cgn_framework/imagenet/weights/resnet50_from_scratch_model_best.pth.tar"
             
             if classifier == "cgn-ensemble":
                 weight_path = "cgn_framework/imagenet/experiments/classifier__in-mini-classifier/model_best.pth"
