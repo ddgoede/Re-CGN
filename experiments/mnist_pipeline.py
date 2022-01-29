@@ -34,7 +34,13 @@ class MNISTPipeline:
     Each Step saves the results to a directory and is not run if cached results exist.
     If generate=False, the pipeline will run for original dataset.
     """
-    def __init__(self, args, setting="Original", train_generative=False, generate=True) -> None:
+    def __init__(self,
+            args,
+            setting="Original",
+            train_generative=False,
+            generate=True,
+            ignore_cache=False,
+        ) -> None:
         """
         Initialize the pipeline.
 
@@ -42,10 +48,12 @@ class MNISTPipeline:
             args: Arguments for the experiment.
             train_generative: Whether to train a GAN/CGN model.
             generate: Whether to generate data.
+            ignore_cache: Whether to ignore cached results.
         """
         self.train_generative = train_generative
         self.generate = generate
         self.setting = setting
+        self.ignore_cache = ignore_cache
         self.args = self._check_args(args)
         print("::::: Experimental setup :::::")
         print("Train generative model:", self.train_generative)
@@ -113,7 +121,8 @@ class MNISTPipeline:
                     f"cgn_framework/mnists/data/{dataset}_train.pth",
                 )
                 test_file_path = train_file_path.replace("_train", "_test")
-                if not (os.path.exists(train_file_path) and os.path.exists(test_file_path)):
+                results_exist = (not (os.path.exists(train_file_path) and os.path.exists(test_file_path)))
+                if results_exist or self.ignore_cache:
                     cmd = f"python {REPO_PATH}/cgn_framework/mnists/generate_data.py --dataset {dataset}"
                     print(cmd)
                     call(cmd, shell=True)
@@ -125,7 +134,7 @@ class MNISTPipeline:
                     REPO_PATH,
                     f"cgn_framework/mnists/data/{dataset}{dataset_suffix}.pth",
                 )
-                if not os.path.exists(tensor_file_path):
+                if (not os.path.exists(tensor_file_path)) or self.ignore_cache:
                     cmd = f"python {REPO_PATH}/cgn_framework/mnists/generate_data.py"\
                         f" --dataset {dataset}  --weight_path {weight_path}"
                     print(cmd)
@@ -144,7 +153,8 @@ class MNISTPipeline:
         train_results_path = f'mnists/experiments/classifier_{expt_suffix}/train_accs.pth'
         test_results_path = f'mnists/experiments/classifier_{expt_suffix}/test_accs.pth'
 
-        if not (os.path.exists(test_results_path) and os.path.exists(train_results_path)):
+        results_exist = not (os.path.exists(test_results_path) and os.path.exists(train_results_path))
+        if results_exist or self.ignore_cache:
             cmd = f"python {REPO_PATH}/cgn_framework/mnists/train_classifier.py"\
                 f" --dataset {dataset} --seed {seed}" + \
                 (f" --combined" if combined else "")
@@ -177,7 +187,12 @@ class MNISTPipeline:
         return results
 
 
-def run_experiments(seed=0, datasets=["colored_MNIST", "double_colored_MNIST", "wildlife_MNIST"], show=False):
+def run_experiments(
+        seed=0,
+        datasets=["colored_MNIST", "double_colored_MNIST", "wildlife_MNIST"],
+        show=False,
+        ignore_cache=False,
+    ):
     """Run experiments on MNISTs"""
 
     columns = []
@@ -200,6 +215,7 @@ def run_experiments(seed=0, datasets=["colored_MNIST", "double_colored_MNIST", "
             train_generative=False,
             generate=True,
             setting=rows[0],
+            ignore_cache=ignore_cache,
         )
         result = pipeline.run()
         # here: 10 denotes the last epoch
@@ -221,6 +237,7 @@ def run_experiments(seed=0, datasets=["colored_MNIST", "double_colored_MNIST", "
             train_generative=False,
             generate=True,
             setting=rows[1],
+            ignore_cache=ignore_cache,
         )
         result = pipeline.run()
         df.at[rows[1], dataset + "-train"] = result["train"][10]
@@ -241,6 +258,7 @@ def run_experiments(seed=0, datasets=["colored_MNIST", "double_colored_MNIST", "
             train_generative=False,
             generate=True,
             setting=rows[2],
+            ignore_cache=ignore_cache,
         )
         result = pipeline.run()
         df.at[rows[2], dataset + "-train"] = result["train"][10]
@@ -262,6 +280,7 @@ def run_experiments(seed=0, datasets=["colored_MNIST", "double_colored_MNIST", "
             train_generative=False,
             generate=True,
             setting=rows[2],
+            ignore_cache=ignore_cache,
         )
         result = pipeline.run()
         df.at[rows[3], dataset + "-train"] = result["train"][10]
@@ -283,6 +302,7 @@ def run_experiments(seed=0, datasets=["colored_MNIST", "double_colored_MNIST", "
             train_generative=False,
             generate=True,
             setting=rows[2],
+            ignore_cache=ignore_cache,
         )
         result = pipeline.run()
         df.at[rows[4], dataset + "-train"] = result["train"][10]
@@ -299,4 +319,7 @@ def run_experiments(seed=0, datasets=["colored_MNIST", "double_colored_MNIST", "
 
 
 if __name__ == "__main__":
-    run_experiments(seed=0)
+    df = run_experiments(seed=0, ignore_cache=False)
+    df.index = ["Original", "GAN", "CGN", "Original + GAN", "Original + CGN"]
+    print("::: Displaying Table 2 :::\n")
+    print(df.astype(float).round(1))
