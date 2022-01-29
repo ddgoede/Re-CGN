@@ -14,7 +14,7 @@ from torchvision.utils import make_grid
 from matplotlib import pyplot as plt
 import os
 
-from experiment_utils import set_env
+from experiment_utils import set_env, seed_everything
 set_env()
 
 from cgn_framework.mnists.generate_data import generate_cf_dataset, generate_dataset, get_dataloaders
@@ -61,6 +61,7 @@ def generate_counterfactual(dataset_size=100000, no_cfs=10):
 
 
 def main():
+    seed_everything(13)
     generate_counterfactual()
 
     # Plot the real and counterfactual iamges (i.e., Figure 3 of the paper).
@@ -98,7 +99,8 @@ def visualise_generated_images(path):
     if not os.path.exists(directory):
         os.makedirs(directory, exist_ok=True)
 
-    plt.savefig(os.path.join(directory, file_name + ".pdf"))
+    plt.axis("off")
+    plt.savefig(os.path.join(directory, file_name + ".pdf"), bbox_inches='tight', pad_inches=0)
     plt.show()
 
 
