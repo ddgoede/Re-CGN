@@ -3,6 +3,7 @@ from turtle import color
 from matplotlib import pyplot as plt
 from matplotlib.axis import XAxis
 import numpy as np
+import json
 
 plt.rcParams.update({
     "text.usetex": True,
@@ -12,41 +13,14 @@ plt.rcParams.update({
 })
 plt.grid(axis='y')
 
-data_unfixed = [
-    0,
-    0,
-    0,
-    4,
-    8,
-    13,
-    10,
-    4,
-    5,
-    3,
-    0,
-]
-
-data_fixed = [
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    1,
-    1,
-    4,
-    7,
-    7,
-]
-
-unfixed_sum = sum(data_unfixed)
-fixed_sum = sum(data_fixed)
+results = json.load(open('experiments/ColoredMNIST_with_EdgeLoss_results.json'))
+data_without_edgeloss = results["correct_digits_fraction_without_edgeloss"]
+data_with_edgeloss = results["correct_digits_fraction"]
 
 x_axis = np.arange(0, 11)
 
-plt.bar(x_axis - 0.2, [d / unfixed_sum for d in data_unfixed], width=0.4, label='Original training', color="skyblue")
-plt.bar(x_axis + 0.2, [d / fixed_sum for d in data_fixed], width=0.4, label='Improved training', color="pink")
+plt.bar(x_axis - 0.2, data_without_edgeloss, width=0.4, label='Training without edge loss', color="skyblue")
+plt.bar(x_axis + 0.2, data_with_edgeloss, width=0.4, label='Training with edge loss', color="pink")
 plt.xticks(x_axis)
 plt.ylabel('Fraction of runs')
 plt.xlabel('Number of not-broken masks')
