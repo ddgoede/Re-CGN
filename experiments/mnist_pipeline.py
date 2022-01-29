@@ -113,7 +113,7 @@ class MNISTPipeline:
                     f"cgn_framework/mnists/data/{dataset}_train.pth",
                 )
                 test_file_path = train_file_path.replace("_train", "_test")
-                if not os.path.exists(train_file_path) and os.path.exists(test_file_path):
+                if not (os.path.exists(train_file_path) and os.path.exists(test_file_path)):
                     cmd = f"python {REPO_PATH}/cgn_framework/mnists/generate_data.py --dataset {dataset}"
                     print(cmd)
                     call(cmd, shell=True)
