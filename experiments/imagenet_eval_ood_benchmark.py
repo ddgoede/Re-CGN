@@ -130,10 +130,6 @@ def main(args):
 
 
 def eval_ood(args, show=False):
-    if args.weight_path is not None:
-        args.weight_path = join(REPO_PATH, args.weight_path)
-        assert exists(args.weight_path), \
-            "Weight path {} does not exist".format(args.weight_path)
 
     run_name = f"{args.classifier}_{args.ood_dataset}"
     result_dir = join(REPO_PATH, "cgn_framework/imagenet/experiments/ood_eval", run_name)
@@ -157,6 +153,11 @@ def eval_ood(args, show=False):
                 result_path, args.ignore_cache
             ))
             print("::: Re-running evaluation")
+
+    if args.weight_path is not None:
+        args.weight_path = join(REPO_PATH, args.weight_path)
+        assert exists(args.weight_path), \
+            "Weight path {} does not exist".format(args.weight_path)
 
     acc1 = main(args)
 
@@ -191,11 +192,6 @@ if __name__ == "__main__":
                         help='ignore cache and force re-evaluation')
     args = parser.parse_args()
 
-    if args.weight_path is not None:
-        args.weight_path = join(REPO_PATH, args.weight_path)
-        assert exists(args.weight_path), \
-            "Weight path {} does not exist".format(args.weight_path)
-
     print(args)
 
     result_dir = join(REPO_PATH, "experiments", "results", "cache")
@@ -214,6 +210,11 @@ if __name__ == "__main__":
                 result_path, args.ignore_cache
             ))
             print("::: Re-running evaluation")
+
+    if args.weight_path is not None:
+        args.weight_path = join(REPO_PATH, args.weight_path)
+        assert exists(args.weight_path), \
+            "Weight path {} does not exist".format(args.weight_path)
 
     acc1 = main(args)
 
