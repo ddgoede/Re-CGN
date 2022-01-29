@@ -356,5 +356,5 @@ if __name__ == "__main__":
     run_analyses(
         datasets=["colored_MNIST", "double_colored_MNIST", "wildlife_MNIST"],
         debug=False,
-        ignore_cache=True,
+        ignore_cache=False,
     )

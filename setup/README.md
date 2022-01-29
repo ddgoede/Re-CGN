@@ -60,3 +60,13 @@ imagenet/weights/
 
 4 files
 ```
+
+### Experiments for MNISTs
+
+Please run the `final-demo.ipynb` notebook to reproduce the results for Table 2.
+Further, the same notebook also has code to visualize additional analyses.
+
+### Experiments for ImageNet-mini and OOD
+Please run the `final-demo.ipynb` notebook to reproduce the results for Table 3, 4, 5.
+Further, the same notebook also has code to visualize additional analyses.
+
