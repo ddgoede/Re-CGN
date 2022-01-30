@@ -3,11 +3,13 @@
 ### Conda environment
 
 ```bash
-conda create -n cgn-gpu python=3.8
+conda env create --file cgn_framework/environment-cpu.yml 
 ```
 
 
 ### Download datasets
+
+You first need to download the data `.zip` file for ImageNet-mini from [here](https://www.kaggle.com/ifigotin/imagenetmini-1000). Download and place it in `cgn_framework/imagenet/data/archive.zip`.
 
 Use the following command to download all required datasets:
 

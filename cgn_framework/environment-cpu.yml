@@ -1,4 +1,4 @@
-name: gcn-cpu
+name: cgn-cpu
 channels:
   - defaults
   - pytorch

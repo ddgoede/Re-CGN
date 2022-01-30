@@ -1,4 +1,4 @@
-name: gcn-gpu
+name: cgn-gpu
 channels:
   - defaults
   - pytorch

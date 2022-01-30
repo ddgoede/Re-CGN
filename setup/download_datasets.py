@@ -50,8 +50,11 @@ def check_downloaded_datasets():
         f"Probably the files for textures/background/ are not downloaded."
     
     # check ImageNet files
-    cue_conflict_dir = join(root, "imagenet/data/cue_conflict")
+    root = join(REPO_PATH, "cgn_framework/imagenet/data")
+
+    cue_conflict_dir = join(root, "cue_conflict")
     classes = glob(join(cue_conflict_dir, "*"))
+    import ipdb; ipdb.set_trace()
     assert len(classes) == 16, \
         "Cue conflict dataset not downloaded properly."
     
@@ -74,28 +77,6 @@ if __name__ == "__main__":
     print("")
 
     # download other datasets
-    print("::: Downloading IN-mini ...")
-    data_dir = join(REPO_PATH, "cgn_framework/imagenet/data/in-mini/train")
-    if not isdir(data_dir):
-        zip_file = join(REPO_PATH, "cgn_framework/imagenet/data/archive.zip")
-        if not exists(zip_file):
-            raise Exception(
-                f"Zip file not found: {zip_file}"\
-                "Please download it from https://www.kaggle.com/ifigotin/imagenetmini-1000"\
-                "and place it in the cgn_framework/imagenet/data/archive.zip"
-            )
-
-        print(f"- Unzipping {zip_file}...")
-    
-        unzip_dir = join(REPO_PATH, "cgn_framework/imagenet/data/imagenet-mini/")
-        if not isdir(unzip_dir):
-            with zipfile.ZipFile(zip_file, "r") as zip_ref:
-                zip_ref.extractall(zip_file.replace("archive.zip", ""))
-        subprocess.call(f"mv {unzip_dir}/* {unzip_dir.replace('imagenet-mini', 'in-mini')}", shell=True)
-        subprocess.call(f"rm -rf {unzip_dir} {zip_file}", shell=True)
-        print("- Done \n")
-    else:
-        print("- IN-mini is already downloaded.")
     
     # download OOD datasets
     print("::: Downloading OOD datasets ...")
@@ -114,11 +95,36 @@ if __name__ == "__main__":
     else:
         print("- IN-sketch is already downloaded. \n")
 
+    # download IN-mini
     print("3. Downloading IN-stylized ...")
     in_stylized_dir = join(REPO_PATH, "cgn_framework/imagenet/data/in-stylized/val/")
     if not isdir(in_stylized_dir):
         subprocess.call("bash ./scripts/download_imagenet_stylized.sh", shell=True)
     else:
         print("- IN-stylized is already downloaded. \n")
+
+    print("::: Downloading IN-mini ...")
+    data_dir = join(REPO_PATH, "cgn_framework/imagenet/data/in-mini/train")
+    if not isdir(data_dir):
+        zip_file = join(REPO_PATH, "cgn_framework/imagenet/data/archive.zip")
+        if not exists(zip_file):
+            raise Exception(
+                f"Zip file not found: {zip_file}"\
+                "Please download it from https://www.kaggle.com/ifigotin/imagenetmini-1000 "\
+                "and place it in the cgn_framework/imagenet/data/archive.zip"
+            )
+
+        print(f"- Unzipping {zip_file}...")
+    
+        unzip_dir = join(REPO_PATH, "cgn_framework/imagenet/data/imagenet-mini/")
+        if not isdir(unzip_dir):
+            with zipfile.ZipFile(zip_file, "r") as zip_ref:
+                zip_ref.extractall(zip_file.replace("archive.zip", ""))
+        subprocess.call(f"mv {unzip_dir}/* {unzip_dir.replace('imagenet-mini', 'in-mini')}", shell=True)
+        subprocess.call(f"rm -rf {unzip_dir} {zip_file}", shell=True)
+        print("- Done \n")
+    else:
+        print("- IN-mini is already downloaded.")
+
 
 
