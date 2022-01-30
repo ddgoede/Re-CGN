@@ -4,6 +4,7 @@
 
 ```bash
 conda env create --file cgn_framework/environment-cpu.yml 
+conda activate cgn-cpu
 ```
 
 

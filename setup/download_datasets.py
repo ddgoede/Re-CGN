@@ -54,11 +54,10 @@ def check_downloaded_datasets():
 
     cue_conflict_dir = join(root, "cue_conflict")
     classes = glob(join(cue_conflict_dir, "*"))
-    import ipdb; ipdb.set_trace()
     assert len(classes) == 16, \
         "Cue conflict dataset not downloaded properly."
     
-    in9_dir = join(root, "imagenet/data/in9")
+    in9_dir = join(root, "in9")
     assert len(glob(join(in9_dir, "*"))) == 9, \
         f"Expected 9 folders in {in9_dir}. "\
         f"Probably the files for imagenet/data/in9/ are not downloaded."
