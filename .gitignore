@@ -1,7 +1,19 @@
+# Others
 bg_challenge
 
 # Media
 figures/*.pdf
+*.png
+*.pdf
+*experiments/results/*.pth
+experiments/weights/*.pth*
+
+# Gradio outputs
+*/flagged/
+
+# Slurm outputs
+cgn_framework/slurm/output_*.out
+*/slurm/output_*.out
 
 # IDE's
 .vscode
