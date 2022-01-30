@@ -92,6 +92,7 @@ def plot_features(
         model_desc="CNN classifier",
         save=True,
         show=False,
+        set_title=True,
     ):
     fig, ax = plt.subplots(1, 2, figsize=(16, 8), constrained_layout=True)
 
@@ -107,7 +108,9 @@ def plot_features(
     sns.scatterplot(data=df_counterfactual, x="Z1", y="Z2", hue="y", ax=ax[1], palette="deep")
     ax[1].legend(fontsize=16)
 
-    plt.suptitle(f"Features for  {model_desc} ({dataset.replace('_', ' ')})", fontsize=25)
+    if set_title:
+        plt.suptitle(f"Features for  {model_desc} ({dataset.replace('_', ' ')})", fontsize=25)
+
     if save:
         save_path = join(
             REPO_PATH,
@@ -269,6 +272,7 @@ class MNISTAnalysis:
             model_desc=f"CNN classifier trained on {model_type}",
             save=save,
             show=show,
+            set_title=False,
         )
     
     def perform_gradcam_quantitative(self, debug=False):
