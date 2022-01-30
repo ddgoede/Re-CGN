@@ -197,6 +197,7 @@ TENSOR_DATASETS = [
 ]
 
 def get_tensor_dataloaders(dataset, batch_size=64, combined=False):
+
     assert dataset in TENSOR_DATASETS, f"Unknown datasets {dataset}"
 
     if 'counterfactual' in dataset:
@@ -211,6 +212,7 @@ def get_tensor_dataloaders(dataset, batch_size=64, combined=False):
 
         ds_train = TensorDataset(*tensor[:2])
         dataset = dataset.replace('_counterfactual', '')
+
     elif 'gan' in dataset:
         tensor = torch.load(f'mnists/data/{dataset}.pth')
 
@@ -223,6 +225,7 @@ def get_tensor_dataloaders(dataset, batch_size=64, combined=False):
 
         ds_train = TensorDataset(*tensor[:2])
         dataset = dataset.replace('_gan', '')
+
     else:
         ds_train = TensorDataset(*torch.load(f'mnists/data/{dataset}_train.pth'))
     ds_test = TensorDataset(*torch.load(f'mnists/data/{dataset}_test.pth'))

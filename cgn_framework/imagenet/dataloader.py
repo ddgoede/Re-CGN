@@ -92,7 +92,6 @@ def transform_labels(x):
 # datasets
 
 class ImagenetVanilla(Dataset) :
-
     def __init__(self, root=join('.', 'imagenet', 'data', "imagenet"), train=True):
         super(ImagenetVanilla, self).__init__()
 
@@ -109,7 +108,7 @@ class ImagenetVanilla(Dataset) :
 
         t_list += [transforms.ToTensor(), normalize]
         self.T_ims = transforms.Compose(t_list)
-        
+
         self.classes = sorted(os.listdir(ims_path))
         self.im_paths, self.labels = self.get_data(ims_path)
 
@@ -152,6 +151,7 @@ class ImagenetCounterfactual(Dataset):
     '''
 
     def __init__(self, ims_path, train=True, n_data=None, mode='x_gen'):
+
         super(ImagenetCounterfactual, self).__init__()
         print(f"Loading counterfactual data from {ims_path}")
         self.full_df = self.get_data(ims_path, train, mode)

@@ -33,6 +33,7 @@ def sample_image(cgn, sample_path, batches_done, device, n_row=3, n_classes=10):
     save(foreground.data, f"{sample_path}/2_{batches_done:d}_foreground.png", n_row)
     save(background.data, f"{sample_path}/3_{batches_done:d}_background.png", n_row)
 
+
 def fit(cfg, cgn, discriminator, dataloader, opts, losses, device, use_time_in_filename=True):
 
     # directories for experiments
@@ -48,7 +49,7 @@ def fit(cfg, cgn, discriminator, dataloader, opts, losses, device, use_time_in_f
     save_cfg(cfg, model_path / "cfg.yaml")
 
     # Training Loop
-    L_perc, L_adv, L_binary = losses
+    L_perc, L_adv, L_binary, L_edge = losses
 
     pbar = tqdm(range(cfg.TRAIN.EPOCHS))
     for epoch in pbar:
@@ -79,6 +80,7 @@ def fit(cfg, cgn, discriminator, dataloader, opts, losses, device, use_time_in_f
             losses_g['adv'] = L_adv(validity, valid)
             losses_g['binary'] = L_binary(mask)
             losses_g['perc'] = L_perc(x_gen, x_gt)
+            losses_g['edge'] = L_edge(mask)
 
             # Backprop and step
             loss_g = sum(losses_g.values())
@@ -145,7 +147,18 @@ def main(cfg):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     cgn = cgn.to(device)
     discriminator = discriminator.to(device)
-    losses = (l.to(device) for l in losses)
+
+    def L_edge(mask):
+        batches, channels, width, height = mask.shape
+
+        inverse_edge_size = 5
+
+        center_of_mask = mask[:, :, width // inverse_edge_size : -width // inverse_edge_size, height // inverse_edge_size : -height // inverse_edge_size]
+        loss = torch.sum(mask) - torch.sum(center_of_mask) * 2 # Multiply by two because the mask is the center + the edge. So mask - center = edge and mask - 2 * center = edge - center.
+
+        return loss / (width * height * batches) * cfg.LAMBDAS.EDGE
+
+    losses = [l.to(device) for l in losses] + [L_edge]
 
     fit(cfg, cgn, discriminator, dataloader, opts, losses, device, use_time_in_filename=cfg.USE_TIME_IN_FILENAME)
 
@@ -155,6 +168,7 @@ def merge_args_and_cfg(args, cfg):
     cfg.TRAIN.EPOCHS = args.epochs
     cfg.TRAIN.BATCH_SIZE = args.batch_size
     cfg.USE_TIME_IN_FILENAME = not args.ignore_time_in_filename
+
     return cfg
 
 if __name__ == "__main__":

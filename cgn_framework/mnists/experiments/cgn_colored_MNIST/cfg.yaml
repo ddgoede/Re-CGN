@@ -5,6 +5,7 @@ LAMBDAS:
   - 0.1
   - 0.01
   - 0.0
+  EDGE: 0.1
 LOG:
   LOSSES: true
   SAVE_ITER: 4000

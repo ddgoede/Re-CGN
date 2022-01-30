@@ -38,6 +38,7 @@ def train(args, model, device, train_loader, optimizer, epoch):
     
     train_acc = 100. * correct / len(train_loader.dataset)
     return train_acc
+  
 
 def test(model, device, test_loader):
     model.eval()
@@ -98,6 +99,7 @@ def main(args):
     torch.save(test_accs, save_path)
     torch.save(train_accs, save_path.replace("test_accs", "train_accs"))
 
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', type=str, required=True, choices=TENSOR_DATASETS,
@@ -116,6 +118,7 @@ if __name__ == '__main__':
                         help='how many batches to wait before logging training status')
     parser.add_argument('--seed', type=int, default=None,
                         help='random seed')
+
     args = parser.parse_args()
 
     print(args)

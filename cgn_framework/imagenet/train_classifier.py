@@ -173,11 +173,11 @@ def main_worker(gpu, ngpus_per_node, args):
     dl_shape_bias = get_cue_conflict_dls(args.batch_size, args.workers)
     dls_in9 = get_in9_dls(args.distributed, args.batch_size, args.workers, ['original', 'mixed_rand', 'mixed_same'])
 
-    
     # eval before training
     if not args.resume:
         metrics = validate(model, val_loader, cf_val_loader,
                                dl_shape_bias, dls_in9, args)
+
         save_metrics = {k: v.item() for k, v in metrics.items()}
         save_dir = join(model_path, 'epochwise_metrics')
         pathlib.Path(save_dir).mkdir(parents=True, exist_ok=True)
@@ -209,6 +209,7 @@ def main_worker(gpu, ngpus_per_node, args):
         # evaluate on validation set
         metrics = validate(model, val_loader, cf_val_loader,
                                dl_shape_bias, dls_in9, args)
+
         save_metrics = {k: v.item() for k, v in metrics.items()}
         save_dir = join(model_path, 'epochwise_metrics')
         pathlib.Path(save_dir).mkdir(parents=True, exist_ok=True)
@@ -218,6 +219,7 @@ def main_worker(gpu, ngpus_per_node, args):
         # acc1_overall = metrics['acc1/0_overall']
         # BUGFIX: there is no key for overall acc1, instead we use acc1/1_real
         acc1_overall = metrics['acc1/1_real']
+
         is_best = acc1_overall > best_acc1_overall
         best_acc1_overall = max(acc1_overall, best_acc1_overall)
 
