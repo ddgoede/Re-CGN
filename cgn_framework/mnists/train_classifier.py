@@ -1,3 +1,4 @@
+import os
 import argparse
 import repackage
 repackage.up()
@@ -34,6 +35,10 @@ def train(args, model, device, train_loader, optimizer, epoch):
     print('\nTrain set: Average loss: {:.4f}, Accuracy: {}/{} ({:.1f}%)\n'.format(
         loss, correct, len(train_loader.dataset),
         100. * correct / len(train_loader.dataset)))
+    
+    train_acc = 100. * correct / len(train_loader.dataset)
+    return train_acc
+  
 
 def test(model, device, test_loader):
     model.eval()
@@ -52,11 +57,15 @@ def test(model, device, test_loader):
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.3f}%)\n'.format(
         test_loss, correct, len(test_loader.dataset),
         100. * correct / len(test_loader.dataset)))
+    
+    test_acc = 100. * correct / len(test_loader.dataset)
+    return test_acc
+
 
 def main(args):
     # model and dataloader
     model = CNN()
-    dl_train, dl_test = get_tensor_dataloaders(args.dataset, args.batch_size)
+    dl_train, dl_test = get_tensor_dataloaders(args.dataset, args.batch_size, combined=args.combined)
 
     # Optimizer
     optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
@@ -66,15 +75,37 @@ def main(args):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = model.to(device)
 
+    train_accs = dict()
+    test_accs = dict()
     for epoch in range(1, args.epochs + 1):
-        train(args, model, device, dl_train, optimizer, epoch)
-        test(model, device, dl_test)
+        train_acc = train(args, model, device, dl_train, optimizer, epoch)
+        test_acc = test(model, device, dl_test)
+        train_accs[epoch] = train_acc
+        test_accs[epoch] = test_acc
         scheduler.step()
+    
+    # save the final model
+    dataset_suffix = (args.dataset) if not args.combined else (args.dataset + "_combined")
+    dataset_suffix += "_seed_" + str(args.seed) if args.seed is not None else ""
+    save_path = f'mnists/experiments/classifier_{dataset_suffix}/weights/ckp_epoch_{args.epochs}.pth'
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    print('Saving model to {}'.format(save_path))
+    torch.save(model.state_dict(), save_path)
+
+    # save the test accuracy
+    save_path = f'mnists/experiments/classifier_{dataset_suffix}/test_accs.pth'
+    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    print('Saving test accuracy to {}'.format(save_path))
+    torch.save(test_accs, save_path)
+    torch.save(train_accs, save_path.replace("test_accs", "train_accs"))
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', type=str, required=True, choices=TENSOR_DATASETS,
                         help='Provide dataset name.')
+    parser.add_argument('--combined', action='store_true',
+                        help='If set, train on both original and generated data.')
     parser.add_argument('--batch_size', type=int, default=64, metavar='N',
                         help='input batch size for training (default: 64)')
     parser.add_argument('--epochs', type=int, default=10, metavar='N',
@@ -85,6 +116,9 @@ if __name__ == '__main__':
                         help='Learning rate step gamma (default: 0.7)')
     parser.add_argument('--log-interval', type=int, default=100, metavar='N',
                         help='how many batches to wait before logging training status')
+    parser.add_argument('--seed', type=int, default=None,
+                        help='random seed')
+
     args = parser.parse_args()
 
     print(args)

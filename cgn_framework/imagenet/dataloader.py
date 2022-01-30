@@ -92,24 +92,24 @@ def transform_labels(x):
 # datasets
 
 class ImagenetVanilla(Dataset) :
-
-    def __init__(self, train=True):
+    def __init__(self, root=join('.', 'imagenet', 'data', "imagenet"), train=True):
         super(ImagenetVanilla, self).__init__()
-        root = join('.', 'imagenet', 'data')
+
         normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                          std=[0.229, 0.224, 0.225])
 
         # Transforms
         if train:
-            ims_path = join(root, 'imagenet', 'train')
+            ims_path = join(root, 'train')
             t_list = [transforms.RandomResizedCrop(224), transforms.RandomHorizontalFlip()]
         else:
-            ims_path = join(root, 'imagenet', 'val')
+            ims_path = join(root, 'val')
             t_list = [transforms.Resize(256), transforms.CenterCrop(224)]
 
         t_list += [transforms.ToTensor(), normalize]
         self.T_ims = transforms.Compose(t_list)
 
+        self.classes = sorted(os.listdir(ims_path))
         self.im_paths, self.labels = self.get_data(ims_path)
 
     def set_len(self, n):
@@ -150,7 +150,8 @@ class ImagenetCounterfactual(Dataset):
           "RUN_NAME_0000000_textures.jpg"
     '''
 
-    def __init__(self, ims_path, train=True, n_data=None, mode='silhouette'):
+    def __init__(self, ims_path, train=True, n_data=None, mode='x_gen'):
+
         super(ImagenetCounterfactual, self).__init__()
         print(f"Loading counterfactual data from {ims_path}")
         self.full_df = self.get_data(ims_path, train, mode)
@@ -182,7 +183,7 @@ class ImagenetCounterfactual(Dataset):
 
     @staticmethod
     def get_data(p, train , mode):
-        subdirs = glob(p + '/train*') if train else glob(p + '/val*')
+        subdirs = glob(p + '_train*') if train else glob(p + '_val*')
 
         dfs = []
         for sub in subdirs:
@@ -290,10 +291,10 @@ class Imagenet9(object):
 
 # dataloaders
 
-def get_imagenet_dls(distributed, batch_size, workers):
+def get_imagenet_dls(root, distributed, batch_size, workers):
     # dataset
-    train_dataset = ImagenetVanilla(train=True)
-    val_dataset = ImagenetVanilla(train=False)
+    train_dataset = ImagenetVanilla(train=True, root=root)
+    val_dataset = ImagenetVanilla(train=False, root=root)
 
     # sampler
     train_sampler = DistributedSampler(train_dataset) if distributed else None
@@ -341,3 +342,10 @@ def get_in9_dls(distributed, batch_size, workers, variations=['mixed_rand', 'mix
                                         batch_size=batch_size,
                                         workers=workers)
     return dls_in9
+
+
+if __name__ == "__main__":
+    in_dls = get_imagenet_dls(root="./imagenet/data/in-mini/", distributed=False, batch_size=32, workers=4)
+    X = in_dls[0].dataset[0]
+    assert X["ims"].shape == torch.Size([3, 224, 224])
+    assert X["labels"].data == 0

@@ -171,7 +171,7 @@ def main(args):
     cgn.eval().to(device)
 
     # path setup
-    time_str = datetime.now().strftime("%Y_%m_%d_%H_")
+    time_str = datetime.now().strftime("%Y_%m_%d_%H_") if not args.ignore_time_in_filename else ""
     trunc_str = f"{args.run_name}_trunc_{args.truncation}"
     data_path = join('imagenet', 'data', time_str + trunc_str)
     ims_path = join(data_path, 'ims')
@@ -238,6 +238,7 @@ if __name__ == '__main__':
                         help='Sample new noise and save to disk for interpolation')
     parser.add_argument('--save_single', default=False, action='store_true',
                         help='Sample single images instead of sheets')
+    parser.add_argument("--ignore_time_in_filename", action="store_true")
 
     args = parser.parse_args()
     print(args)
