@@ -89,7 +89,7 @@ def display_result_for_mini_imagenet_sample(
     return plt.gcf()
 
 
-def display_result_for_counterfactual_sample(ys, classes, clf_transforms, ensemble_gradcam):
+def display_result_for_counterfactual_sample(cgn, ys, classes, clf_transforms, ensemble_gradcam):
 
     # Generate the output
     # print(":: Generating CF sample ...")
@@ -179,7 +179,7 @@ class CGNGradio:
 
         if dataset == "ImageNet-Mini":
             index = self.df[self.df.class_name == o_label].sample(1).sample_index.values[0]
-            sample = ds_val[index]
+            sample = self.ds_val[index]
             fig = display_result_for_mini_imagenet_sample(
                 image=sample["ims"],
                 label=sample["labels"],
@@ -194,6 +194,7 @@ class CGNGradio:
                 self.df[self.df.class_name == b_label].class_index.unique()[0],
             ]
             fig = display_result_for_counterfactual_sample(
+                cgn=self.cgn,
                 ys=ys,
                 classes=self.ds_val.classes,
                 clf_transforms=self.ds_val.T_ims,
@@ -210,7 +211,7 @@ class CGNGradio:
         self.iface.launch(**kwargs)
 
 
-if __name__ == "__main__":
+def init_gradio_module(launch=False, **launch_kwargs):
     seed_everything(0)
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -251,4 +252,12 @@ if __name__ == "__main__":
     ensemble_gradcam = EnsembleGradCAM(ensemble_model=model, gradcam_method="GradCAM")
 
     cgn_gradio = CGNGradio(model, cgn, ds_val, df, ensemble_gradcam)
-    cgn_gradio.launch(share=True)
+
+    if launch:
+        cgn_gradio.launch(**launch_kwargs)
+
+    return cgn_gradio
+
+
+if __name__ == "__main__":
+    init_gradio_module(launch=True, share=False)
