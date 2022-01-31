@@ -29,11 +29,15 @@ from cgn_framework.mnists.dataloader import get_tensor_dataloaders, TENSOR_DATAS
 from experiments.gradcam_utils import compute_iou_between_gt_and_gradcam_for_mnist
 
 # set plotting configuration
-plt.rcParams.update({
-    "text.usetex": True,
-    "font.family": "serif",
-    "font.serif": ["Computer Modern Roman"],
-})
+try:
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "serif",
+        "font.serif": ["Computer Modern Roman"],
+    })
+except:
+    print("Could not set plotting configuration for LaTeX")
+    pass
 
 
 def get_model_features(model, dl, device, num_batches_to_use=None):
