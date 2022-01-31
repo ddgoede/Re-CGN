@@ -1,12 +1,12 @@
 ## Setup
 
-### Conda environment
+### Environment
 
+Depending on whether you have a CPU/GPU machine, install a `conda` environment:
 ```bash
-conda env create --file cgn_framework/environment-cpu.yml 
-conda activate cgn-cpu
+conda env create --file cgn_framework/environment-gpu.yml 
+conda activate cgn-gpu
 ```
-
 
 ### Download datasets
 
@@ -70,6 +70,7 @@ Please run the `final-demo.ipynb` notebook to reproduce the results for Table 2.
 Further, the same notebook also has code to visualize additional analyses.
 
 ### Experiments for ImageNet-mini and OOD
+
 Please run the `final-demo.ipynb` notebook to reproduce the results for Table 3, 4, 5.
 Further, the same notebook also has code to visualize additional analyses.
 

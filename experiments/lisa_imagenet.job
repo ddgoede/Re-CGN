@@ -15,7 +15,7 @@ module load Anaconda3/2021.05
 
 # Activate your environment
 source deactivate
-source activate gcn-gpu
+source activate cgn-gpu
 
 # Run your code
 ## runs all experiments to reproduce Table 3 and 4 in the paper
