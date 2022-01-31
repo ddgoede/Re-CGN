@@ -1,5 +1,15 @@
 ## Setup
 
+### Clone the repository
+
+```sh
+# clone the repository
+git clone git@github.com:danilodegoede/fact-team3.git
+
+# switch to dev branch
+git checkout dev
+```
+
 ### Environment
 
 Depending on whether you have a CPU/GPU machine, install a `conda` environment:
