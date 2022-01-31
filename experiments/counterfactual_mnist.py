@@ -66,11 +66,11 @@ def main():
 
     # Plot the real and counterfactual iamges (i.e., Figure 3 of the paper).
     for dataset, weight_folder in DATASETS.items():
-        visualise_generated_images(f"mnists/data/{dataset}_train.pth")
-        visualise_generated_images(f"mnists/data/{dataset}_counterfactual.pth")
+        visualise_generated_images(f"mnists/data/{dataset}_train.pth", title=f"{dataset}: Original")
+        visualise_generated_images(f"mnists/data/{dataset}_counterfactual.pth", title=f"{dataset}: Counterfactual")
 
 
-def visualise_generated_images(path):
+def visualise_generated_images(path, title=None):
     images, labels = torch.load(path)
 
     # Transform the image range [-1, 1] to the range [0, 1]
@@ -91,6 +91,7 @@ def visualise_generated_images(path):
 
     #TODO: Explain the permute.
     plt.imshow(grid.permute((1, 2, 0)))
+    plt.title(title)
 
     # Save the resulting figures accordingly.
     file_name = "qualitative_" + path.split("/")[-1].split(".")[0]
