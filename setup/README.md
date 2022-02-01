@@ -14,18 +14,24 @@ git checkout dev
 
 Depending on whether you have a CPU/GPU machine, install a `conda` environment:
 ```bash
+cd fact-team3
 conda env create --file cgn_framework/environment-gpu.yml 
 conda activate cgn-gpu
 ```
 
 ### Download datasets
 
-You first need to download the data `.zip` file for ImageNet-mini from [here](https://www.kaggle.com/ifigotin/imagenetmini-1000). Download and place it in `cgn_framework/imagenet/data/archive.zip`.
+The ImageNet-mini dataset needs to be downloaded from Kaggle. Please export your Kaggle credentials using the following command. The key is the Kaggle API key and can be found in your account settings.
+```sh
+export KAGGLE_USERNAME=<your_username>
+export KAGGLE_KEY=<your_key>
+```
+
+<!-- You first need to download the data `.zip` file for ImageNet-mini from [here](https://www.kaggle.com/ifigotin/imagenetmini-1000). Download and place it in `cgn_framework/imagenet/data/archive.zip`. -->
 
 Use the following command to download all required datasets:
 
 ```bash
-cd /path/to/repo/
 python setup/download_datasets.py
 ```
 This should download datasets for both `mnists` and `imagenet` tasks.

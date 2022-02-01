@@ -105,20 +105,17 @@ if __name__ == "__main__":
     print("::: Downloading IN-mini ...")
     data_dir = join(REPO_PATH, "cgn_framework/imagenet/data/in-mini/train")
     if not isdir(data_dir):
-        zip_file = join(REPO_PATH, "cgn_framework/imagenet/data/archive.zip")
+        zip_file = join(REPO_PATH, "cgn_framework/imagenet/data/imagenetmini-1000.zip")
         if not exists(zip_file):
-            raise Exception(
-                f"Zip file not found: {zip_file}"\
-                "Please download it from https://www.kaggle.com/ifigotin/imagenetmini-1000 "\
-                "and place it in the cgn_framework/imagenet/data/archive.zip"
-            )
+            subprocess.call("kaggle datasets download -d ifigotin/imagenetmini-1000", shell=True)
+            subprocess.call("mv imagenetmini-1000.zip {}".format(zip_file), shell=True)
 
         print(f"- Unzipping {zip_file}...")
     
         unzip_dir = join(REPO_PATH, "cgn_framework/imagenet/data/imagenet-mini/")
         if not isdir(unzip_dir):
             with zipfile.ZipFile(zip_file, "r") as zip_ref:
-                zip_ref.extractall(zip_file.replace("archive.zip", ""))
+                zip_ref.extractall(zip_file.replace("imagenetmini-1000.zip", ""))
         subprocess.call(f"mv {unzip_dir}/* {unzip_dir.replace('imagenet-mini', 'in-mini')}", shell=True)
         subprocess.call(f"rm -rf {unzip_dir} {zip_file}", shell=True)
         print("- Done \n")
