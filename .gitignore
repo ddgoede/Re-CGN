@@ -1,6 +1,8 @@
 # Others
 bg_challenge
 
+# slurm
+slurm_output*.out
 
 # Media
 figures/*.pdf
