@@ -44,3 +44,14 @@ if __name__ == "__main__":
         subprocess.call("bash scripts/download_resnet50_trained_from_scratch.sh", shell=True)
     else:
         print("ResNet50 trained from scratch weights already downloaded.")
+    
+    # download invariant classifier trained on IN-mini (trained by us)
+    path = join(
+        REPO_PATH,
+        "cgn_framework/imagenet/weights/classifier_on_in-mini_model_best.pth",
+    )
+    if not exists(path):
+        subprocess.call("gdown https://drive.google.com/uc?id=19D7_t3uzA_OlV4fA21Jm6bcB8GJMzPnK", shell=True)
+        subprocess.call("mv model_best.pth {}".format(path), shell=True)
+    else:
+        print("Invariant classifier trained on IN-mini weights already downloaded.")

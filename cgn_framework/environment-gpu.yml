@@ -1,4 +1,4 @@
-name: gcn-gpu
+name: cgn-gpu
 channels:
   - defaults
   - pytorch
@@ -30,3 +30,5 @@ dependencies:
     - pytorch-gradcam
     - gradio
     - natsort
+    - kaggle==1.5.12
+    - ipywidgets==7.6.5

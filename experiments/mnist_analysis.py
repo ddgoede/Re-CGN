@@ -29,11 +29,15 @@ from cgn_framework.mnists.dataloader import get_tensor_dataloaders, TENSOR_DATAS
 from experiments.gradcam_utils import compute_iou_between_gt_and_gradcam_for_mnist
 
 # set plotting configuration
-plt.rcParams.update({
-    "text.usetex": True,
-    "font.family": "serif",
-    "font.serif": ["Computer Modern Roman"],
-})
+try:
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "serif",
+        "font.serif": ["Computer Modern Roman"],
+    })
+except:
+    print("Could not set plotting configuration for LaTeX")
+    pass
 
 
 def get_model_features(model, dl, device, num_batches_to_use=None):
@@ -353,7 +357,8 @@ def run_analyses(seed=0, datasets=["colored_MNIST"], show=False, debug=False, ig
             show_gradcam_qualitative(dataset, images_paths_og, images_paths_cf)
 
     # if show==True, display all figures/results together
-    plot_iou_for_og_and_cf(iou_path_og_per_dataset, iou_path_cf_per_dataset, show=show)
+    if show:
+        plot_iou_for_og_and_cf(iou_path_og_per_dataset, iou_path_cf_per_dataset, show=show)
 
 
 if __name__ == "__main__":

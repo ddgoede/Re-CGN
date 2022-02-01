@@ -36,7 +36,7 @@ def generate_gan_dataset(generator, path, dataset_size, no_cfs, device):
 
 def generate_cf_dataset(cgn, path, dataset_size, no_cfs, device):
     x, y = [], []
-    cgn.batch_size = 100
+    cgn.batch_size = min(100, dataset_size)
     n_classes = 10
 
     total_iters = int(dataset_size // cgn.batch_size // no_cfs)

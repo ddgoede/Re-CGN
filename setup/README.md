@@ -1,18 +1,39 @@
 ## Setup
 
-### Conda environment
+### Clone the repository
 
-```bash
-conda create -n cgn-gpu python=3.8
+```sh
+# clone the repository
+git clone git@github.com:danilodegoede/fact-team3.git
+
+# switch to dev branch
+git checkout dev
 ```
 
+### Environment
+
+Depending on whether you have a CPU/GPU machine, install a `conda` environment:
+```bash
+cd fact-team3
+conda env create --file cgn_framework/environment-gpu.yml 
+conda activate cgn-gpu
+```
 
 ### Download datasets
+
+The ImageNet-mini dataset needs to be downloaded from Kaggle. Please export your Kaggle credentials using the following command. The key is the Kaggle API key and can be found in your account settings.
+```sh
+export KAGGLE_USERNAME=<your_username>
+export KAGGLE_KEY=<your_key>
+```
+
+Or alternatively, you can download your API key `kaggle.json` file and put it here `~/.kaggle/kaggle.json`.
+
+<!-- You first need to download the data `.zip` file for ImageNet-mini from [here](https://www.kaggle.com/ifigotin/imagenetmini-1000). Download and place it in `cgn_framework/imagenet/data/archive.zip`. -->
 
 Use the following command to download all required datasets:
 
 ```bash
-cd /path/to/repo/
 python setup/download_datasets.py
 ```
 This should download datasets for both `mnists` and `imagenet` tasks.
@@ -63,10 +84,11 @@ imagenet/weights/
 
 ### Experiments for MNISTs
 
-Please run the `final-demo.ipynb` notebook to reproduce the results for Table 2.
+Please run the `experiments/final-demo.ipynb` notebook to reproduce the results for Table 2.
 Further, the same notebook also has code to visualize additional analyses.
 
 ### Experiments for ImageNet-mini and OOD
-Please run the `final-demo.ipynb` notebook to reproduce the results for Table 3, 4, 5.
+
+Please run the `experiments/final-demo.ipynb` notebook to reproduce the results for Table 3, 4, 5.
 Further, the same notebook also has code to visualize additional analyses.
 
