@@ -31,13 +31,13 @@ def main():
                         help='Save single images instead of sheets')
     parser.add_argument('--truncation', type=float, default=1.0,
                         help='Truncation value for noise sampling')
-    parser.add_argument('--episodes', type=int, default=300,
+    parser.add_argument('--episodes', type=int, default=50,
                         help="We don't do dataloading, hence, one episode = one gradient update.")
     parser.add_argument('--batch_sz', type=int, default=1,
                         help='Batch size, use in conjunciton with batch_acc')
-    parser.add_argument('--batch_acc', type=int, default=4000,
+    parser.add_argument('--batch_acc', type=int, default=2048,
                         help='pseudo_batch_size = batch_acc*batch size')
-    parser.add_argument('--save_iter', type=int, default=4000,
+    parser.add_argument('--save_iter', type=int, default=2048,
                         help='Save samples/weights every n iter')
     parser.add_argument('--log_losses', default=False, action='store_true',
                         help='Print out losses')
