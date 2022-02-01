@@ -27,6 +27,8 @@ export KAGGLE_USERNAME=<your_username>
 export KAGGLE_KEY=<your_key>
 ```
 
+Or alternatively, you can download your API key `kaggle.json` file and put it here `~/.kaggle/kaggle.json`.
+
 <!-- You first need to download the data `.zip` file for ImageNet-mini from [here](https://www.kaggle.com/ifigotin/imagenetmini-1000). Download and place it in `cgn_framework/imagenet/data/archive.zip`. -->
 
 Use the following command to download all required datasets:
