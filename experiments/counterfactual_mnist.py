@@ -48,26 +48,26 @@ def generate_counterfactual(dataset_size=100000, no_cfs=10):
         # Next, generate the counterfactual images.
         weight_path = f"mnists/experiments/{weight_folder}/weights/ckp.pth"
 
-        if os.path.exists(f"mnists/data/{dataset}_counterfactual.pth"):
-            print(f"'{dataset}_counterfactual.pth' already exist, skipping..")
+        if os.path.exists(f"mnists/data/{dataset}_counterfactual_samples.pth"):
+            print(f"'{dataset}_counterfactual_samples.pth' already exist, skipping..")
         else:
             cgn = CGN()
             cgn.load_state_dict(torch.load(weight_path, 'cpu'))
             cgn.to(device).eval()
             print(f"Generating the counterfactual {dataset} of size {dataset_size}")
-            generate_cf_dataset(cgn=cgn, path=dataset + '_counterfactual.pth',
+            generate_cf_dataset(cgn=cgn, path=dataset + '_counterfactual_samples.pth',
                                 dataset_size=dataset_size, no_cfs=no_cfs,
                                 device=device)
 
 
-def main():
+def main(dataset_size=100000, no_cfs=10):
     seed_everything(13)
-    generate_counterfactual()
+    generate_counterfactual(dataset_size=dataset_size, no_cfs=no_cfs)
 
     # Plot the real and counterfactual iamges (i.e., Figure 3 of the paper).
     for dataset, weight_folder in DATASETS.items():
         visualise_generated_images(f"mnists/data/{dataset}_train.pth", title=f"{dataset}: Original")
-        visualise_generated_images(f"mnists/data/{dataset}_counterfactual.pth", title=f"{dataset}: Counterfactual")
+        visualise_generated_images(f"mnists/data/{dataset}_counterfactual_samples.pth", title=f"{dataset}: Counterfactual")
 
 
 def visualise_generated_images(path, title=None):
