@@ -21,6 +21,8 @@ dependencies:
   - ipdb
   - jupyterlab
   - torchmetrics
+  - notebook
+  - ipywidgets==7.6.5
   - pip:
     - tqdm==4.62.3
     - repackage==0.7.3
