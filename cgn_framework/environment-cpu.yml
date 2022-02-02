@@ -21,6 +21,7 @@ dependencies:
   - ipdb
   - jupyterlab
   - torchmetrics
+  - tensorboardX==2.4
   - pip:
     - tqdm==4.62.3
     - repackage==0.7.3

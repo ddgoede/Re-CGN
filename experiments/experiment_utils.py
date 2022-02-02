@@ -7,6 +7,10 @@ import torch
 
 REPO_PATH = dirname(dirname(abspath(__file__)))
 
+import itertools
+
+from torch.utils.data import Dataset
+import torchvision
 
 def set_env():
     """This function does two things:
@@ -35,3 +39,22 @@ def seed_everything(seed):
         torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
+
+
+def load_generated_imagenet(images_dir, images_count=None):
+    # Get the locations of the generated images
+    image_range = range(images_count) if images_count is not None else itertools.count()
+    image_paths = (images_dir + "/" + path for path, _ in zip(os.listdir(images_dir), image_range))
+
+    return [torchvision.io.read_image(path) for path in image_paths]
+
+
+class ImageDirectoryLoader(Dataset):
+    def __init__(self, images_dir):
+        self.image_paths = list((images_dir + "/" + path for path in os.listdir(images_dir)))
+
+    def __len__(self):
+        return len(self.image_paths)
+
+    def __getitem__(self, i):
+        return torchvision.io.read_image(self.image_paths[i]) / 127.5 - 1

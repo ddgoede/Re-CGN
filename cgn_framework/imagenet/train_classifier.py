@@ -165,7 +165,7 @@ def main_worker(gpu, ngpus_per_node, args):
             print("=> no checkpoint found at '{}'".format(args.resume))
 
     cudnn.benchmark = True
-    
+
 
     ### dataloaders
     train_loader, val_loader, train_sampler = get_imagenet_dls(args.data, args.distributed, args.batch_size, args.workers)
@@ -566,7 +566,7 @@ def accuracy(output, target, topk=(1,)):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
-    parser.add_argument('--data', default='data/ImageNet', 
+    parser.add_argument('--data', default='data/ImageNet',
                         help='path to dataset')
     parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet18',
                         choices=model_names,

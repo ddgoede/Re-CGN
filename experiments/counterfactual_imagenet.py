@@ -6,7 +6,7 @@ from datetime import datetime
 import pandas as pd
 import os
 
-from experiment_utils import set_env, dotdict, seed_everything
+from experiment_utils import set_env, dotdict, seed_everything, load_generated_imagenet
 set_env()
 
 from cgn_framework.imagenet.generate_data import main as generate_main
@@ -43,11 +43,8 @@ def main(n_data=6, generate_latex=True):
     # Get counterfactual images
     images_dir = os.path.join(data_path, 'ims')
 
-    # Get the locations of the generated images
-    image_paths = sorted([images_dir + "/" + path for path, _ in zip(os.listdir(images_dir), range(n_data))])
-
     # Construct a grid with the generated images
-    images = [torchvision.io.read_image(path) for path in image_paths]
+    images = load_generated_imagenet(images_dir, n_data)
     image_grid = make_grid(images, nrow=n_data)
 
     plt.imshow(image_grid.permute(1, 2, 0))
