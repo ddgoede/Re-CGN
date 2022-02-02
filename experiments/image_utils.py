@@ -17,7 +17,7 @@ from torchvision import transforms
 from imagenet_utils import denormalize
 
 
-def show_single_image(x: torch.Tensor, figsize=None, normalized=True, title="Sample image"):
+def show_single_image(x: torch.Tensor, figsize=None, normalized=True, title="Sample image", show=True, ax=None, **imshow_kwargs):
     """Displays a single image."""
 
     assert len(x.shape) in [1, 3]
@@ -32,12 +32,16 @@ def show_single_image(x: torch.Tensor, figsize=None, normalized=True, title="Sam
     else:
         raise ValueError("Unsupported shape: {}".format(x.shape))
 
-    fig, ax = plt.subplots(figsize=figsize)
-    ax.imshow(x)
-    ax.set_title(title, fontsize=16)
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+
+    ax.imshow(x, **imshow_kwargs)
+    ax.set_title(title, fontsize=16, fontweight="bold")
     ax.set_xticks([])
     ax.set_yticks([])
-    plt.show()
+
+    if show:
+        plt.show()
 
 
 def show_multiple_images(
