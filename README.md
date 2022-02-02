@@ -34,7 +34,7 @@ A demo notebook is included in the repository.
 It contains all the key reproducibility results that are presented in our paper.
 It contains the code to download the datasets and models.
 
-Start a `jupyterlab` session using `jupyter lab` and run the notebook `experiments/final-demo.ipynb`.
+Start a `jupyterlab` session using `jupyter lab` and run the notebook [`experiments/final-demo.ipynb`](./experiments/final-demo.ipynb).
 
 
 ## Training
