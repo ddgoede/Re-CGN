@@ -8,7 +8,7 @@ rm colored_mnist.tar.gz
 
 # Download BG challenge dataset
 wget "https://github.com/MadryLab/backgrounds_challenge/releases/download/data/backgrounds_challenge_data.tar.gz"
-tar -xzvf backgrounds_challenge_data.tar.gz
+tar -xzf backgrounds_challenge_data.tar.gz
 mkdir imagenet/data/in9
 mv bg_challenge/* imagenet/data/in9
 rmdir bg_challenge

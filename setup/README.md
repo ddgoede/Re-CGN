@@ -5,6 +5,7 @@
 ```sh
 # clone the repository
 git clone git@github.com:danilodegoede/fact-team3.git
+cd fact-team3
 
 # switch to dev branch
 git checkout dev
@@ -14,7 +15,6 @@ git checkout dev
 
 Depending on whether you have a CPU/GPU machine, install a `conda` environment:
 ```bash
-cd fact-team3
 conda env create --file cgn_framework/environment-gpu.yml 
 conda activate cgn-gpu
 ```
