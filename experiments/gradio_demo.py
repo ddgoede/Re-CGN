@@ -260,4 +260,4 @@ def init_gradio_module(launch=False, **launch_kwargs):
 
 
 if __name__ == "__main__":
-    init_gradio_module(launch=True, share=False)
+    init_gradio_module(launch=True, share=True)
