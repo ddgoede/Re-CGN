@@ -1,6 +1,8 @@
 import readline
+
 from experiment_utils import set_env, dotdict
-set_env()
+if __name__ == "__main__":
+    set_env()
 
 from inception_score_pytorch.inception_score import inception_score
 from experiment_utils import load_generated_imagenet, ImageDirectoryLoader
@@ -35,15 +37,19 @@ def generate_images(weights_path, run_name):
     return final_dir_name
 
 def mu_mask(file_path):
+    '''
+    Reads the mu_mask values from the text file at location `file_path` (one float per line).
+    Then calculates their mean and standard deviation.
+    '''
     with open(file_path, 'r') as f:
         mus = f.readlines()
         mus_count = len(mus)
 
     mus = [float(mu[:-1]) for mu in mus]
-    avg_mu = sum(mus) / mus_count
-    sds_mu = ((mu - avg_mu) ** 2 for mu in mus)
-    sd_mu = (sum(sds_mu) / mus_count) ** 0.5
-    return avg_mu, sd_mu
+    avg_mask = sum(mus) / mus_count
+    sds_mask = ((mu - avg_mask) ** 2 for mu in mus)
+    sd_mask = (sum(sds_mask) / mus_count) ** 0.5
+    return avg_mask, sd_mask
 
 def main(args):
     if args.data_dir is None:

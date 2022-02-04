@@ -8,10 +8,10 @@ def run_experiments():
         "bg-ablation",
         "rec-ablation",
     ]:
-        data_dir = generate_images('cgn_framework/imagenet/weights/' + loss_name, loss_name)
+        data_dir = generate_images(f'imagenet/weights/{loss_name}.pth', loss_name)
 
         images = ImageDirectoryLoader(data_dir + '/ims')
         inception = inception_score(images, splits=2, resize=True)
         avg_mask, sd_mask = mu_mask(data_dir + '/mean_masks.txt')
 
-        yield inception, avg_mask, sd_mask
+        yield loss_name, inception, avg_mask, sd_mask
