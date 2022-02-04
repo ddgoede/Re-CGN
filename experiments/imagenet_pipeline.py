@@ -56,7 +56,7 @@ def generate_counterfactual_dataset(
             call(cmd, shell=True)
 
 
-def train_classifier(args: dict = dict(lr=0.001), prefix="in-mini", seed=0, disp_epoch=45, show=False):
+def train_classifier(args: dict = dict(lr=0.001), prefix="in-mini", seed=0, disp_epoch=45, show=False, ignore_cache=False):
     """Trains classifier on IN-mini dataset"""
 
     args = dotdict(args)
@@ -65,7 +65,7 @@ def train_classifier(args: dict = dict(lr=0.001), prefix="in-mini", seed=0, disp
     run_name = f"{prefix}-classifier"
     expt_dir = join(REPO_PATH, "cgn_framework/imagenet/experiments", f"classifier__{run_name}")
     epoch_metrics_path = join(expt_dir, f"epochwise_metrics/epoch_{disp_epoch}.pt")
-    if not exists(epoch_metrics_path):
+    if not exists(epoch_metrics_path) or ignore_cache:
         
         print("::::: Training classifier :::::")
         script_path = join(REPO_PATH, "cgn_framework/imagenet/train_classifier.py")
@@ -129,7 +129,7 @@ def run_eval_on_ood_benchmarks(seed=0, ignore_cache=False, show=False):
     return df
 
 
-def run_experiments(seed=0, generate_cf_data=False, disp_epoch=45):
+def run_experiments(seed=0, generate_cf_data=False, disp_epoch=45, ignore_cache=False):
     """Runs experiments on IN-mini dataset
 
     1. Generates CF dataset
@@ -149,18 +149,18 @@ def run_experiments(seed=0, generate_cf_data=False, disp_epoch=45):
 
     # step 2: train classifier
     print("\n::::: Training classifier :::::\n")
-    metrics = train_classifier(prefix="in-mini", seed=seed, disp_epoch=disp_epoch)
+    metrics = train_classifier(prefix="in-mini", seed=seed, disp_epoch=disp_epoch, ignore_cache=ignore_cache)
 
     # step 3: evaluate on OOD benchmarks
     print("\n::::: Evaluating OOD :::::\n")
-    df_ood = run_eval_on_ood_benchmarks(seed=seed, show=False)
+    df_ood = run_eval_on_ood_benchmarks(seed=seed, show=False, ignore_cache=ignore_cache)
 
     return metrics, df_ood
 
 
 
 if __name__ == "__main__":
-    metrics_clf, df_ood = run_experiments(seed=0, generate_cf_data=False, disp_epoch=34)
+    metrics_clf, df_ood = run_experiments(seed=0, generate_cf_data=False, disp_epoch=34, ignore_cache=False)
 
     # construct Table 3 of the paper
     heads = ["shape", "texture", "bg"]
