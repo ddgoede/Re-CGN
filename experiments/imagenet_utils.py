@@ -111,7 +111,10 @@ class EnsembleGradCAM:
 
         outputs["gt_label"] = label.item()
         for i, prefix in enumerate(mechanisms):
+            from torch.nn.functional import softmax
+            pred_dist = getattr(self, f"m_{prefix}")(image.unsqueeze(0)).softmax(1)[0]
             outputs[f"{prefix}_label"] = getattr(self, f"m_{prefix}")(image.unsqueeze(0)).argmax(1)[0].cpu().item()
+            outputs[f"{prefix}_pred_dist"] = pred_dist.detach().cpu()
 
         return outputs
 
