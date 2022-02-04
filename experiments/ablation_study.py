@@ -1,17 +1,32 @@
-from experiment_utils import ImageDirectoryLoader
-from inception_score import inception_score, mu_mask, generate_images
+from experiment_utils import ImageDirectoryLoader, set_env
+set_env()
 
-def run_experiments():
+from inception_score import inception_score, mu_mask, generate_images
+import torch
+import os
+
+def run_experiments(ignore_cache=False):
     for loss_name in [
         "shape-ablation",
         "text-ablation",
         "bg-ablation",
         "rec-ablation",
     ]:
-        data_dir = generate_images(f'imagenet/weights/{loss_name}.pth', loss_name)
+        cache_file_path = 'imagenet/experiments/loss-ablation/results-' + loss_name + ".pth"
+        if os.path.exists(cache_file_path):
+            results = torch.load(cache_file_path)
+            yield loss_name, results['inception'], results['avg_mask'], results['sd_mask']
+        else:
+            data_dir = generate_images(f'imagenet/weights/{loss_name}.pth', loss_name)
 
-        images = ImageDirectoryLoader(data_dir + '/ims')
-        inception = inception_score(images, splits=2, resize=True)
-        avg_mask, sd_mask = mu_mask(data_dir + '/mean_masks.txt')
+            images = ImageDirectoryLoader(data_dir + '/ims')
+            inception = inception_score(images, splits=2, resize=True)
+            avg_mask, sd_mask = mu_mask(data_dir + '/mean_masks.txt')
 
-        yield loss_name, inception, avg_mask, sd_mask
+            torch.save({
+                "inception": inception,
+                "avg_mask": avg_mask,
+                "sd_mask": sd_mask,
+            }, cache_file_path)
+
+            yield loss_name, inception, avg_mask, sd_mask
