@@ -1,5 +1,5 @@
 """
-Authors: Jesse Maas, Paul Hilders, Piyush Bagad, Danilo de Goede
+Authors: Anonymous
 
 counterfactual_mnist.py
 
