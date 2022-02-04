@@ -55,3 +55,21 @@ if __name__ == "__main__":
         subprocess.call("mv model_best.pth {}".format(path), shell=True)
     else:
         print("Invariant classifier trained on IN-mini weights already downloaded.")
+    
+    # download weights for loss ablation study
+    weight_dir = join(REPO_PATH, "cgn_framework/imagenet/weights")
+    paths = [
+        join(weight_dir, "bg-ablation.pth"),
+        join(weight_dir, "rec-ablation.pth"),
+    ]
+    ids = [
+        "1RURmaClHfCD7tthuIqXczYs_yBK_6Lgv",
+        "10S9pYe0P7Nodkqd1igP2RirimSWv35Bt",
+    ]
+    for i, path in enumerate(paths):
+        filename = os.path.basename(path)
+        if not exists(path):
+            subprocess.call(f"gdown https://drive.google.com/uc?id={ids[i]}", shell=True)
+            subprocess.call(f"mv {filename} {path}", shell=True)
+        else:
+            print(f"Weights already downloaded at {path}.")

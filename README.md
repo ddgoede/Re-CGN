@@ -1,19 +1,42 @@
-Template source: https://github.com/paperswithcode/releasing-research-code
->📋  A template README.md for code accompanying a Machine Learning paper
-# My Paper Title
 
-This repository is the official implementation of [My Paper Title](https://arxiv.org/abs/2030.12345). 
+<!-- Template source: https://github.com/paperswithcode/releasing-research-code -->
+<!-- >📋  A template README.md for code accompanying a Machine Learning paper -->
 
->📋  Optional: include a graphic explaining your approach/main result, bibtex entry, link to demos, blog posts and tutorials
-## Requirements
+# Replication of Counterfactual Generative Networks
 
-To install requirements:
+This repository is a replication implementation of [Counterfactual Generative Networks](https://arxiv.org/abs/2030.12345) as part of the ML [Reproducibility Challenge 2021](https://paperswithcode.com/rc2021). 
 
-```setup
-pip install -r requirements.txt
+<!-- >📋  Optional: include a graphic explaining your approach/main result, bibtex entry, link to demos, blog posts and tutorials -->
+
+![Sample](./media/sample_gradcam_label_castle_index_1871-1.png)
+*GradCAM-based heatmap visualized for shape, texture and background heads of CGN ensemble classifier for a sample image from ImageNet-mini. $y$ denotes the original label while $\hat{y}$ denotes the predicted label by each of the three heads.*
+
+## Setup and Requirements
+
+Clone the repository:
+```sh
+git clone git@github.com:danilodegoede/fact-team3.git
+cd fact-team3
 ```
 
->📋  Describe how to set up the environment, e.g. pip/conda/docker commands, download datasets, etc...
+Depending on whether you have a CPU/GPU machine, install a `conda` environment:
+
+```setup
+conda env create --file cgn_framework/environment-gpu.yml 
+conda activate cgn-gpu
+```
+
+<!-- >📋  Describe how to set up the environment, e.g. pip/conda/docker commands, download datasets, etc... -->
+
+## Demo notebook
+
+A demo notebook is included in the repository.
+It contains all the key reproducibility results that are presented in our paper.
+It contains the code to download the datasets and models.
+
+Start a `jupyterlab` session using `jupyter lab` and run the notebook [`experiments/final-demo.ipynb`](./experiments/final-demo.ipynb).
+
+
 ## Training
 
 To train the model(s) in the paper, run this command:
@@ -51,6 +74,11 @@ Our model achieves the following performance on :
 
 >📋  Include a table of results from your paper, and link back to the leaderboard for clarity and context. If your main result is a figure, include that figure and link to the command or notebook to reproduce it. 
 
-## Contributing
+<!-- ## Contributing
 
->📋  Pick a licence and describe how to contribute to your code repository.
+>📋  Pick a licence and describe how to contribute to your code repository. -->
+
+## Acknowledgements
+
+* Template source: https://github.com/paperswithcode/releasing-research-code
+* The authors of the original CGN paper: Axel Sauer and Andreas Geiger

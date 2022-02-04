@@ -5,6 +5,7 @@
 ```sh
 # clone the repository
 git clone git@github.com:danilodegoede/fact-team3.git
+cd fact-team3
 
 # switch to dev branch
 git checkout dev
@@ -14,11 +15,14 @@ git checkout dev
 
 Depending on whether you have a CPU/GPU machine, install a `conda` environment:
 ```bash
-cd fact-team3
 conda env create --file cgn_framework/environment-gpu.yml 
 conda activate cgn-gpu
 ```
 
+### Download datasets and models
+
+The code to download the datasets and models is in the demo notebook itself.
+<!-- 
 ### Download datasets
 
 The ImageNet-mini dataset needs to be downloaded from Kaggle. Please export your Kaggle credentials using the following command. The key is the Kaggle API key and can be found in your account settings.
@@ -28,8 +32,6 @@ export KAGGLE_KEY=<your_key>
 ```
 
 Or alternatively, you can download your API key `kaggle.json` file and put it here `~/.kaggle/kaggle.json`.
-
-<!-- You first need to download the data `.zip` file for ImageNet-mini from [here](https://www.kaggle.com/ifigotin/imagenetmini-1000). Download and place it in `cgn_framework/imagenet/data/archive.zip`. -->
 
 Use the following command to download all required datasets:
 
@@ -80,7 +82,7 @@ imagenet/weights/
 └── resnet50_from_scratch_model_best.pth.tar
 
 4 files
-```
+``` -->
 
 ### Experiments for MNISTs
 
