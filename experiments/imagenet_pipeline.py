@@ -188,9 +188,9 @@ if __name__ == "__main__":
     )
 
     col_to_key = {
-        "IN-9": "in_9_acc1_original/avg",
-        "Mixed-same": "in_9_acc1_mixed_same/avg",
-        "Mixed-rand": "in_9_acc1_mixed_rand/avg",
+        "IN-9": "in_9_acc1_original/shape_texture",
+        "Mixed-same": "in_9_acc1_mixed_same/shape_texture",
+        "Mixed-rand": "in_9_acc1_mixed_rand/shape_texture",
         "BG-gap": "in_9_gaps/bg_gap",
     }
 

@@ -61,10 +61,14 @@ if __name__ == "__main__":
     paths = [
         join(weight_dir, "bg-ablation.pth"),
         join(weight_dir, "rec-ablation.pth"),
+        join(weight_dir, "shape-ablation.pth"),
+        join(weight_dir, "text-ablation.pth"),
     ]
     ids = [
         "1RURmaClHfCD7tthuIqXczYs_yBK_6Lgv",
         "10S9pYe0P7Nodkqd1igP2RirimSWv35Bt",
+        "1jk7OAqcm7Rmr3IlQKp8zXLRJGK7Jpz6n",
+        "1CaehPSrDLdSXNfgyQsDBY9RmekoGj1_2",
     ]
     for i, path in enumerate(paths):
         filename = os.path.basename(path)
