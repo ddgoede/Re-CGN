@@ -5,7 +5,7 @@ if __name__ == "__main__":
     set_env()
 
 from inception_score_pytorch.inception_score import inception_score
-from experiment_utils import load_generated_imagenet, ImageDirectoryLoader
+from experiment_utils import ImageDirectoryLoader
 
 from torch.utils.data import Dataset, DataLoader, TensorDataset
 
@@ -15,6 +15,9 @@ import os
 
 
 def generate_images(weights_path, run_name):
+    '''
+    Use the CGN to generate images on which the inception score and mu_mask will be calculated.
+    '''
     from cgn_framework.imagenet.generate_data import main as generate_main
 
     args = dotdict({

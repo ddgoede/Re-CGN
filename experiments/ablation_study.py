@@ -6,6 +6,9 @@ import torch
 import os
 
 def run_experiments(ignore_cache=False):
+    '''
+    This is a generator for the inception score and mu mask results used in the ablation study
+    '''
     for loss_name in [
         "shape-ablation",
         "text-ablation",

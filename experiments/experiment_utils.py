@@ -42,6 +42,9 @@ def seed_everything(seed):
 
 
 def load_generated_imagenet(images_dir, images_count=None):
+    """
+    Loads the images in the specified directory eagerly
+    """
     # Get the locations of the generated images
     image_range = range(images_count) if images_count is not None else itertools.count()
     image_paths = (images_dir + "/" + path for path, _ in zip(os.listdir(images_dir), image_range))
@@ -50,6 +53,9 @@ def load_generated_imagenet(images_dir, images_count=None):
 
 
 class ImageDirectoryLoader(Dataset):
+    """
+    Loads the images in the specified directory
+    """
     def __init__(self, images_dir):
         self.image_paths = list((images_dir + "/" + path for path in os.listdir(images_dir)))
 
