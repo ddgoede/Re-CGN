@@ -106,7 +106,7 @@ def run_eval_on_ood_benchmarks(seed=0, ignore_cache=False, show=False):
                 weight_path = "cgn_framework/imagenet/weights/resnet50_from_scratch_model_best.pth.tar"
             
             if classifier == "cgn-ensemble":
-                weight_path = "cgn_framework/imagenet/experiments/classifier__in-mini-classifier/model_best.pth"
+                weight_path = "cgn_framework/imagenet/weights/classifier_on_in-mini_model_best.pth"
 
             args = dict(
                 seed=seed,
