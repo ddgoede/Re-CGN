@@ -204,7 +204,7 @@ def main(args):
                 x_gt, mask, premask, foreground, background, bg_mask = cgn(ys=ys)
                 x_gen = mask * foreground + (1 - mask) * background
 
-                mean_mask = mask.mean()
+                mean_mask = str(mask.mean().item())
                 mean_masks.append(mean_mask)
 
                 # save image
@@ -215,6 +215,9 @@ def main(args):
             # save labels
             df = pd.DataFrame(columns=[im_name] + ys)
             df.to_csv(csv_path, mode='a')
+
+    with open(join(data_path, 'mean_masks.txt'), 'w') as mean_mask_file:
+        mean_mask_file.write("\n".join(mean_masks))
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
