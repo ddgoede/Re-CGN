@@ -80,7 +80,7 @@ We conduct additional experiments and analysis to further investigate the main c
 
 
 ![TSNE](./media/addl_expt_tsne_sample.png)
-*Interestingly, digits 3-5-8 are similar in shape and their clusters are closer together as well. This strengthens the intuition that the classifier actually ignoring spurious correlation (digit color) and focusing on causal correlation (digit shape).*
+*Interestingly, digits 3-5-8 are similar in shape and their clusters are closer together as well. This strengthens the intuition that the classifier actually ignores spurious correlations (digit color) and focuses on causal correlations (digit shape).*
 
 <!-- ## Training
 
