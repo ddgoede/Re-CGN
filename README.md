@@ -128,3 +128,15 @@ Our model achieves the following performance on :
 
 * Template source: https://github.com/paperswithcode/releasing-research-code
 * The authors of the original CGN paper: Axel Sauer and Andreas Geiger
+
+
+
+If you use this code or find it helpful, please consider citing our work:
+```bibtex
+@inproceedings{bagad2022reproducibility,
+  title={Reproducibility Study of “Counterfactual Generative Networks”},
+  author={Bagad, Piyush and Maas, Jesse and Hilders, Paul and de Goede, Danilo},
+  booktitle={ML Reproducibility Challenge 2021 (Fall Edition)},
+  year={2022}
+}
+```
