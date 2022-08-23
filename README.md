@@ -16,7 +16,7 @@ This repository is a replication implementation of [Counterfactual Generative Ne
 Clone the repository:
 ```sh
 git clone git@github.com:danilodegoede/Re-CGN.git
-cd fact-team3
+cd Re-CGN
 ```
 
 Depending on whether you have a CPU/GPU machine, install a `conda` environment:
